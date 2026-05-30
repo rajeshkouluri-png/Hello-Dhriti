@@ -26,7 +26,7 @@
 </script>
     <meta charset="UTF-8"></meta>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
-    <title>పాఠం -10 అభ్యాసన దీపిక</title>
+    <title>పాఠం -10  అభ్యాసన దీపిక</title>
     <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&amp;display=swap" rel="stylesheet"></link>
     <style>
         body { font-family: 'Ramabhadra', 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 10px; }
@@ -64,7 +64,7 @@
 <body>
 
 <div id="lms-container">
-    <h2 style="color: #2c3e50; text-align: center;">పాఠం -10,- "ద, డ, అక్షరాలు" - అభ్యాసన దీపిక</h2>
+    <h2 style="color: #2c3e50; text-align: center;">పాఠం -10,- ద, డ, అక్షరాలు" - అభ్యాసన దీపిక</h2>
     
     <div class="stage active" id="stage1">
         <h3>Step 1: Watch the Video</h3>
@@ -74,7 +74,7 @@
 
     <div class="stage" id="stage2">
         <h3>Step 2: Identify the Letter</h3>
-        <p>Listen carefully and click the letter <button onclick="replayAudio()" style="background:none; border:none; font-size:24px; cursor:pointer; outline:none;" title="Play Sound">🔊</button></p>
+        <p>Listen carefully and click the letter</p>
         <div class="tile-grid" id="id-grid"></div>
         <div class="feedback-box" id="stage2-feedback">
             <h3 style="color: #27ae60;">Well Done!</h3>
@@ -194,6 +194,8 @@ let activeBlank = null;
 let qIdx = 0;
 let wordIdx = 0;
 
+// Update: Create a shuffled list of all 6 unique letters
+// This ensures every letter is asked exactly once.
 const targetSet = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
 let synthVoices = [];
@@ -204,29 +206,18 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-window.onload = () => {
-    const vidContainer = document.getElementById('video-container');
-    if(vidContainer) vidContainer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
-    
-    const s4grid = document.getElementById('stage4-tiles');
-    s4grid.innerHTML = ''; 
-    CONFIG.stage4Letters.forEach(l => {
-        const t = document.createElement('div');
-        t.className = 'tile'; t.innerText = l;
-        t.onclick = () => fillSelected(l);
-        s4grid.appendChild(t);
-    });
-};
-
 function speak(txt) {
     try {
+        // 1. Tells your Kodular app to speak the letter
         if (window.AppInventor) {
             window.AppInventor.setWebViewString(txt);
         } 
+        // 2. Parent iframe backup
         else if (window.parent) {
             window.parent.postMessage({ type: "playAudio", text: txt }, "*");
         }
 
+        // 3. Browser Fallback (For your Blogger site)
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             setTimeout(() => {
@@ -241,18 +232,10 @@ function speak(txt) {
     }
 }
 
-function replayAudio() {
-    if (qIdx < targetSet.length) {
-        speak(targetSet[qIdx]);
-    }
-}
-
 function startLearning() {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.resume();
-        let silentUtterance = new SpeechSynthesisUtterance("");
-        window.speechSynthesis.speak(silentUtterance);
-    }
+    window.speechSynthesis.resume();
+    let silentUtterance = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(silentUtterance);
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
@@ -264,20 +247,28 @@ function goToStage(n) {
     if(n === 3) loadScramble();
 }
 
+// Logic updated to cycle through all 6 letters without repeating or leaving any out
 function loadId() {
     const grid = document.getElementById('id-grid');
     const feedbackBox = document.getElementById('stage2-feedback');
     
+    // Check if we have completed all 6 letters
     if(qIdx >= targetSet.length) {
         grid.innerHTML = '';
         feedbackBox.style.display = 'block';
         return;
     }
 
+    // Get the current target letter from the shuffled 6-letter set
     const target = targetSet[qIdx];
+    
+    // Slight delay to allow the UI to refresh before speaking
     setTimeout(() => speak(target), 500);
 
+    // Clear and Redraw the grid with a NEW random order
     grid.innerHTML = '';
+    
+    // Create a fresh shuffled array of the 6 letters for the UI tiles
     const displayTiles = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
     displayTiles.forEach(letter => {
@@ -288,20 +279,25 @@ function loadId() {
         t.onclick = () => {
             totalAttempts++;
             if(letter === target) { 
+                // Visual feedback for correct answer
                 t.style.background = "#d4edda";
                 t.style.borderColor = "#28a745";
+                
+                // Move to the next index in the 6-letter sequence
                 qIdx++; 
+                
+                // Refresh the whole grid (Randomize positions for the next turn)
                 setTimeout(loadId, 800); 
             } else { 
+                // Visual feedback for wrong answer
                 t.classList.add('wrong');
-                speak(target); 
+                speak(target); // Repeat the target letter if they miss
                 setTimeout(() => t.classList.remove('wrong'), 500);
             }
         };
         grid.appendChild(t);
     });
 }
-
 function loadScramble() {
     if(wordIdx >= wordData.length) {
         document.getElementById('image-container').innerHTML = "";
@@ -355,12 +351,8 @@ function checkStage4() {
     let allCorrect = true;
     for(let k in CONFIG.stage4Answers) {
         const el = document.getElementById(k);
-        if(el.innerText.trim() === CONFIG.stage4Answers[k].trim()) {
-            el.className = 'drop-zone correct';
-        } else { 
-            el.className = 'drop-zone wrong'; 
-            allCorrect = false; 
-        }
+        if(el.innerText === CONFIG.stage4Answers[k]) el.className = 'drop-zone correct';
+        else { el.className = 'drop-zone wrong'; allCorrect = false; }
     }
     if(allCorrect) {
         document.getElementById('check-btn').style.display = 'none';
@@ -371,25 +363,42 @@ function checkStage4() {
 function showFinalScore() {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('finish').classList.add('active');
-    let rating = (totalAttempts <= 27) ? 5 : (totalAttempts <= 32) ? 4 : (totalAttempts <= 38) ? 3 : (totalAttempts <= 45) ? 2 : 1;
+    
+    let rating = (totalAttempts <= 30) ? 5 : (totalAttempts <= 35) ? 4 : (totalAttempts <= 40) ? 3 : (totalAttempts <= 45) ? 2 : 1;
     let msgs = ["", "Try Again!", "Keep Practicing!", "Good Effort!", "Great Job!", "Perfect Mastery!"];
     let stars = "";
     for (let i = 1; i <= 5; i++) stars += (i <= rating) ? '<span class="star-filled">\u2605</span>' : '<span class="star-empty">\u2606</span>';
+    
     document.getElementById('star-display').innerHTML = stars;
     document.getElementById('final-eval-text').innerText = msgs[rating];
 
+    // --- FIXED COMBINED HANDSHAKE ---
+    
+    // 1. ALWAYS fire the postMessage so your hub.html catches it, saves to Firebase, and blinks the return tab!
     try {
         window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
     } catch(e) {
         console.log("hub.html communication failed:", e);
     }
 
+    // 2. ALSO notify Kodular just in case you ever want to track scores inside app blocks
     try {
         if (window.AppInventor) {
             window.AppInventor.setWebViewString("Score:" + rating);
         }
     } catch(e) { }
 }
+window.onload = () => {
+    const vidContainer = document.getElementById('video-container');
+    if(vidContainer) vidContainer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
+    const s4grid = document.getElementById('stage4-tiles');
+    CONFIG.stage4Letters.forEach(l => {
+        const t = document.createElement('div');
+        t.className = 'tile'; t.innerText = l;
+        t.onclick = () => fillSelected(l);
+        s4grid.appendChild(t);
+    });
+};
 </script>
 </body>
 </html>
