@@ -117,39 +117,38 @@
         });
     };
 
-    // అత్యంత పవర్‌ఫుల్ ఆడియో ఫంక్షన్ (యాప్స్ కోసం ప్రత్యేకంగా)
-    // Kodular యాప్ కోసం పర్ఫెక్ట్ ఆడియో ట్రిక్ (DOM Audio)
-// యాప్స్ (iframes) కోసం పర్ఫెక్ట్ ఆడియో బూస్ట్ ట్రిక్
-function speak(txt) {
+    function speak(txt) {
         try {
-            // మొబైల్ సిస్టమ్ వాయిస్ ద్వారా చదివించడం (ఇది ఎప్పటికీ బ్లాక్ అవ్వదు)
-            if ('speechSynthesis' in window) {
-                // పాత వాయిస్ ఏమైనా ఉంటే ఆపేయాలి
-                window.speechSynthesis.cancel();
-                
-                // చిన్న బ్రేక్ (Timeout) ఇచ్చి కొత్త వాయిస్ మొదలుపెట్టాలి
-                setTimeout(() => {
-                    let u = new SpeechSynthesisUtterance(txt);
-                    u.lang = 'te-IN'; // తెలుగు భాష
-                    u.rate = 0.8;     // కొంచెం నెమ్మదిగా పిల్లలకు అర్థమయ్యేలా
-                    window.speechSynthesis.speak(u);
-                }, 100); // 100 మిల్లీసెకన్ల గ్యాప్
-            }
-            
-            // ఇది కోడులార్‌కి సిగ్నల్ పంపే బ్యాకప్ (ఒకవేళ పైది ఫెయిల్ అయితే)
-            if (window.parent) {
+            // 1. Kodular Preferred Method: Send text to WebViewString
+            if (window.AppInventor) {
+                window.AppInventor.setWebViewString(txt);
+            } 
+            // 2. Parent iframe postMessage Backup
+            else if (window.parent) {
                 window.parent.postMessage({ type: "playAudio", text: txt }, "*");
             }
+
+            // 3. Browser Fallback (For your Blogger site)
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                setTimeout(() => {
+                    let u = new SpeechSynthesisUtterance(txt);
+                    u.lang = 'te-IN';
+                    u.rate = 0.75; 
+                    window.speechSynthesis.speak(u);
+                }, 100);
+            }
         } catch (e) {
-            console.log("Audio failed:", e);
+            console.log("Audio native routing failed:", e);
         }
     }
-    // స్పీకర్ బటన్ నొక్కినప్పుడు ఆడియో మళ్ళీ ప్లే చేయడానికి
+
     function replayAudio() {
         if (qIdx < targetSet.length) {
             speak(targetSet[qIdx]);
         }
     }
+    
     function startLearning() {
         document.getElementById('video-container').innerHTML = ""; 
         goToStage(2);
@@ -162,7 +161,7 @@ function speak(txt) {
         if(n === 3) loadScramble();
     }
 
-function loadId() {
+    function loadId() {
         if(qIdx >= targetSet.length) {
             document.getElementById('id-grid').innerHTML = '';
             document.getElementById('stage2-feedback').style.display = 'block';
@@ -171,10 +170,10 @@ function loadId() {
         
         const target = targetSet[qIdx];
         
-        // కొత్త అక్షరం చదవడానికి అర సెకను టైమ్ (Delay) ఇస్తున్నాం
+        // Slight delay to allow UI to render completely before audio plays
         setTimeout(() => {
             speak(target);
-        }, 500); 
+        }, 600); 
 
         const grid = document.getElementById('id-grid');
         grid.innerHTML = '';
@@ -186,10 +185,10 @@ function loadId() {
                 totalAttempts++;
                 if(l === target) { 
                     qIdx++; 
-                    loadId(); // కరెక్ట్ అయితే నెక్స్ట్ అక్షరం వస్తుంది
+                    loadId(); 
                 }
                 else { 
-                    speak(target); // రాంగ్ అయితే మళ్లీ పాత అక్షరమే చదువుతుంది
+                    speak(target); 
                 }
             };
             grid.appendChild(t);
@@ -265,7 +264,13 @@ function loadId() {
         document.getElementById('star-display').innerHTML = stars;
         document.getElementById('final-eval-text').innerText = msgs[rating];
 
-        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+        try {
+            if (window.AppInventor) {
+                window.AppInventor.setWebViewString("Score:" + rating);
+            } else {
+                window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+            }
+        } catch(e) { }
     }
 </script>
 </body>
