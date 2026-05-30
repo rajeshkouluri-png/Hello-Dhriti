@@ -48,7 +48,6 @@
         .tile { border: 3px solid #ddd; background: #fff; cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
         .tile:active { transform: translateY(4px); box-shadow: none; }
         
-        /* FIXED: Set explicit visibility text color for Android WebView compatibility */
         .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #2c3e50 !important; }
         
         .selected-blank { border: 3px solid #e67e22 !important; background: #fff3e0 !important; }
@@ -122,7 +121,6 @@
 const CONFIG = {
     videoID: "6xgkzulOsxg",
     
-    // CRITICAL ENCODING FIX: Replaced Thai unicode lookalike \u0C28 mixup with pure Telugu layout matching
     stage2Letters: [
         '\u0C26', // ద
         '\u0C24', // త
@@ -198,7 +196,7 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-// CONSOLIDATED INITIALIZATION ENGINE
+// FIXED: Master single execution initialization handler sequence
 window.onload = () => {
     populateVoices();
     
@@ -345,11 +343,36 @@ function selectBlank(n) {
     document.getElementById('b'+n).classList.add('selected-blank');
 }
 
+// FIXED: Embedded look-ahead focus matching routine to handle empty indices safely inside app sandboxes
 function fillSelected(l) {
-    if(activeBlank) {
+    if (!activeBlank) {
+        for (let i = 1; i <= 6; i++) {
+            if (!document.getElementById('b' + i).innerText) {
+                activeBlank = i;
+                break;
+            }
+        }
+    }
+
+    if (activeBlank) {
         totalAttempts++;
-        document.getElementById('b'+activeBlank).innerText = l;
-        document.getElementById('b'+activeBlank).classList.remove('wrong');
+        document.getElementById('b' + activeBlank).innerText = l;
+        document.getElementById('b' + activeBlank).classList.remove('wrong');
+        
+        let nextEmpty = null;
+        for (let i = 1; i <= 6; i++) {
+            if (!document.getElementById('b' + i).innerText) {
+                nextEmpty = i;
+                break;
+            }
+        }
+        
+        if (nextEmpty) {
+            selectBlank(nextEmpty);
+        } else {
+            activeBlank = null;
+            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('selected-blank'));
+        }
     }
 }
 
