@@ -27,7 +27,8 @@
     </style>
 </head>
 <body>
-
+<audio id="appAudioPlayer" style="display:none;"></audio>
+    
 <div id="lms-container">
     <h2 style="color: #2c3e50; text-align: center;">పాఠం -1,- "ప, ల, క  అక్షరాలు" - అభ్యాసన దీపిక</h2>
     
@@ -117,37 +118,27 @@
     };
 
     // అత్యంత పవర్‌ఫుల్ ఆడియో ఫంక్షన్ (యాప్స్ కోసం ప్రత్యేకంగా)
+    // Kodular యాప్ కోసం పర్ఫెక్ట్ ఆడియో ట్రిక్ (DOM Audio)
     function speak(txt) {
         try {
-            // గూగుల్ డెవలపర్ ఆడియో లింక్ (దీన్ని బ్రౌజర్లు బ్లాక్ చేయలేవు)
-            let audioUrl = "https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=te&q=" + encodeURIComponent(txt);
-            let audio = new Audio(audioUrl);
+            let url = "https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=te&q=" + encodeURIComponent(txt);
+            let player = document.getElementById("appAudioPlayer");
             
-            let playPromise = audio.play();
-            
-            // ఒకవేళ ఇంటర్నెట్ స్లో ఉండి ఈ ఆడియో ప్లే అవ్వకపోతే, ఫోన్ సిస్టమ్ వాయిస్‌ని వాడుతుంది
-            if (playPromise !== undefined) {
-                playPromise.catch(function(error) {
-                    console.log("Audio URL blocked, falling back to native TTS", error);
-                    playNativeVoice(txt);
-                });
-            }
+            player.src = url;
+            player.play().catch(function(error) {
+                console.log("App Blocked Audio, Fallback to System Voice", error);
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    let u = new SpeechSynthesisUtterance(txt);
+                    u.lang = 'te-IN';
+                    u.rate = 0.8;
+                    window.speechSynthesis.speak(u);
+                }
+            });
         } catch (e) {
-            playNativeVoice(txt);
+            console.log("Audio completely failed.");
         }
     }
-
-    // బ్యాకప్ వాయిస్ ఫంక్షన్
-    function playNativeVoice(txt) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            let u = new SpeechSynthesisUtterance(txt);
-            u.lang = 'te-IN'; 
-            u.rate = 0.8;
-            window.speechSynthesis.speak(u);
-        }
-    }
-
     function startLearning() {
         document.getElementById('video-container').innerHTML = ""; 
         goToStage(2);
