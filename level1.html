@@ -119,22 +119,28 @@
 
     // అత్యంత పవర్‌ఫుల్ ఆడియో ఫంక్షన్ (యాప్స్ కోసం ప్రత్యేకంగా)
     // Kodular యాప్ కోసం పర్ఫెక్ట్ ఆడియో ట్రిక్ (DOM Audio)
+// యాప్స్ (iframes) కోసం పర్ఫెక్ట్ ఆడియో బూస్ట్ ట్రిక్
     function speak(txt) {
         try {
             let url = "https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=te&q=" + encodeURIComponent(txt);
             let player = document.getElementById("appAudioPlayer");
             
             player.src = url;
-            player.play().catch(function(error) {
-                console.log("App Blocked Audio, Fallback to System Voice", error);
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                    let u = new SpeechSynthesisUtterance(txt);
-                    u.lang = 'te-IN';
-                    u.rate = 0.8;
-                    window.speechSynthesis.speak(u);
-                }
-            });
+            player.load(); // ఇది కొత్తగా చేర్చాం, ఆడియోను ఫోర్స్ చేసి రెడీ చేస్తుంది
+            
+            let playPromise = player.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(function(error) {
+                    console.log("App Blocked Audio, Fallback to System Voice", error);
+                    if ('speechSynthesis' in window) {
+                        window.speechSynthesis.cancel();
+                        let u = new SpeechSynthesisUtterance(txt);
+                        u.lang = 'te-IN';
+                        u.rate = 0.8;
+                        window.speechSynthesis.speak(u);
+                    }
+                });
+            }
         } catch (e) {
             console.log("Audio completely failed.");
         }
