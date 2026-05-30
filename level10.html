@@ -48,7 +48,7 @@
         .tile { border: 3px solid #ddd; background: #fff; cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
         .tile:active { transform: translateY(4px); box-shadow: none; }
         
-        /* FIXED: Added strict contrast rule for text visibility inside Android container layers */
+        /* Enforced high contrast configuration rules for mobile WebView font clarity */
         .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #2c3e50 !important; font-weight: bold; }
         
         .selected-blank { border: 3px solid #e67e22 !important; background: #fff3e0 !important; }
@@ -120,7 +120,8 @@
 
 <script>
 const CONFIG = {
-    videoID: "6xgkzulOsxg",
+    // FIXED: Formatted video properties into a clean array parameter to stop rendering blocks
+    videoIDs: ["6xgkzulOsxg"],
     
     stage2Letters: [
         '\u0C26', // ద
@@ -197,13 +198,16 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-// FIXED: Unified master loader exactly matching the implementation in Level 9
+// FIXED CORE INITIALIZATION LOOP HANDLER
 window.onload = () => {
     populateVoices();
     
     const vidContainer = document.getElementById('video-container');
     if(vidContainer) {
-        vidContainer.innerHTML = `<iframe id="lesson-video" width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
+        vidContainer.innerHTML = '';
+        CONFIG.videoIDs.forEach(id => {
+            vidContainer.innerHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen style="margin-bottom:15px;"></iframe>`;
+        });
     }
     
     const s4grid = document.getElementById('stage4-tiles');
@@ -258,6 +262,7 @@ function startLearning() {
     goToStage(2);
 }
 
+// RESTORED STAGE LAYER CONTROLS
 function goToStage(n) {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('stage' + n).classList.add('active');
@@ -344,7 +349,7 @@ function selectBlank(n) {
     document.getElementById('b'+n).classList.add('selected-blank');
 }
 
-// FIXED: Brought over the auto-focus empty selector from Level 9 to stop null block drops
+// FIXED: Implemented auto fallback matching index selectors to prevent block drop hanging
 function fillSelected(l) {
     if (!activeBlank) {
         for (let i = 1; i <= 6; i++) {
