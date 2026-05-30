@@ -139,6 +139,12 @@
             console.log("Audio completely failed.");
         }
     }
+    // స్పీకర్ బటన్ నొక్కినప్పుడు ఆడియో మళ్ళీ ప్లే చేయడానికి
+    function replayAudio() {
+        if (qIdx < targetSet.length) {
+            speak(targetSet[qIdx]);
+        }
+    }
     function startLearning() {
         document.getElementById('video-container').innerHTML = ""; 
         goToStage(2);
