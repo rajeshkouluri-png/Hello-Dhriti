@@ -249,12 +249,19 @@
     document.getElementById('star-display').innerHTML = stars;
     document.getElementById('final-eval-text').innerText = msgs[rating];
 
+    // --- FIXED COMBINED HANDSHAKE ---
+    
+    // 1. ALWAYS fire the postMessage so your hub.html catches it, saves to Firebase, and blinks the return tab!
     try {
-        // Updated for Kodular handshake
+        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+    } catch(e) {
+        console.log("hub.html communication failed:", e);
+    }
+
+    // 2. ALSO notify Kodular just in case you ever want to track scores inside app blocks
+    try {
         if (window.AppInventor) {
             window.AppInventor.setWebViewString("Score:" + rating);
-        } else {
-            window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
         }
     } catch(e) { }
 }
