@@ -48,7 +48,8 @@
         .tile { border: 3px solid #ddd; background: #fff; cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
         .tile:active { transform: translateY(4px); box-shadow: none; }
         
-        .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #333; }
+        /* FIXED: Force clear text visibility color context inside mobile container engines */
+        .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #2c3e50 !important; font-weight: bold; }
         
         .selected-blank { border: 3px solid #e67e22 !important; background: #fff3e0 !important; }
         .wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
@@ -159,49 +160,41 @@ const CONFIG = {
 };
 const wordData = [
     {
-        // గద (Ga-da)
         w: '\u0C17\u0C26', 
         l: ['\u0C17', '\u0C26'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhtcpn--eyyVdJKNWPYdftQM1IVAlYv7nqnxYJZALa8sb9eDhvdSXrussvBGzBnN9XIVrRzDd6aWjdKjFN1jxwhGo-RdMOzP8CFreq0FGMihjUdSlqa1BUQtaMW3vzJQ6u74wvDdafurXPznKMnLBH93uHVfvJW_P01Riv2p2PhgzH5yu8S6SMR__jZct6g'
     },
     {
-        // వరద (Va-ra-da)
         w: '\u0C35\u0C30\u0C26', 
         l: ['\u0C35', '\u0C30', '\u0C26'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEimsPIfz-myIpUXjXsWUToYY5_yFOCWjZR8PziqpIYdoLKWtwxVjUpqTmaKf6HVv3fYchG1caed1sBDfrdPq07BdEda0YJNLhaFitKHK6i59MEZ-OmECpCBGICalB_oXm3IxVh546wVbZTZEiXQvYyfSY7m10j1_7T0hsZYm3g8D46cXnmJGMvYSOEng7NL'
     },
     {
-        // దండ (Dan-da)
         w: '\u0C26\u0C02\u0C21', 
         l: ['\u0C26\u0C02', '\u0C21'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgN66hOTQHfAj56g3PYNFf_2cNdz8lPHpuczff9ZmpM7jwWmgMX_cvS71QM8PVcN0m5IBLmMa2GUrQvfDl3lnlPyxtdWroFgBk05IMY72Vum-CSg2e9N2X77rpwiNXCfde5obYVkrTa9_jvpcMSHV4nTRr1t2KLm4CXRop_H0c01HjiqZvN7AEk23UIkdJA'
     },
     {
-        // దంతం (Dan-tham)
         w: '\u0C26\u0C02\u0C24\u0C02', 
         l: ['\u0C26\u0C02', '\u0C24\u0C02'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhpsTx0LrOzv-toFkzOwicoMxcuBAdrkCiVyWfqOwc4gG8GHOAJQQ1qvZNAia7J7PwyHvFNy2vzL6slkxuHP2wZmA0XBRpvQrlyvH8lYa_9zkF-U93aSaIMLEx1UhPL_n5ZJTbx7ixmQBBQZuQux_IqJrepdm9xZogRqCf-zkFbVxYqQCW5c3nArUisqrGo'
     },
     {
-        // గంప (Gam-pa)
         w: '\u0C17\u0C02\u0C2A', 
         l: ['\u0C17\u0C02', '\u0C2A'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhYVAk_CPDXhTUwE_iuCaIwnFWs5_b4bRW-8Ufnp_W6ZMPUJeenfm4k0PeiuuYYBNjH9vWphxCtunk3a-vBDKFZy-w4RAv1-K1mFtMQ3GTy_cszkqM2BjAZIKts9xjx9CnUAWMUpBu1JXbnLU8xrl5J_8rdsaKGUAZL-wzU9590l09FVss0dkKgEUApFebv'
     },
     {
-        // పడగ (Pa-da-ga)
         w: '\u0C2A\u0C21\u0C17', 
         l: ['\u0C2A', '\u0C21', '\u0C17'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEjaYFktphep_oocX4XPYhWF4AEsxynNe4jIuuSu3x3-cwHZnX0wCk1EJwbDaYOtwQF9aE3-JSrBRYNwMeN4rJ1yJjT5Ut2VY3RSb4_Z2lgL2quKaJnhUufS81ToitGoJTTIPF_WCeoEbkJF1vNb4UBTkQ2JCUb34UlyNfioUJPbFJ51Tgx5_nZonP6x9lMM'
     },
     {
-        // గంట (Gan-ta)
         w: '\u0C17\u0C02\u0C1F', 
         l: ['\u0C17\u0C02', '\u0C1F'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEirwhRvLEi538xi75j7F70roTmUtJdeIl2DAQi4_c3b_tvs9uNe12322uldso0C-NQiuCTjLUrkz_Dn1lT1Sk7WyNJwfPh-Ofn6WXPEQ6NjgdvwzcX7tMsP-U5IZDZ4nG_PLXmWl79f_uAcbez8SHEGOkBAZvFCbAM0N_HcfnKJqCPXvcG70PCKQunxnvhn'
     },
     {
-        // జంట (Jan-ta)
         w: '\u0C1C\u0C02\u0C1F', 
         l: ['\u0C1C\u0C02', '\u0C1F'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhfm6RcqzsU2M-antga_w30AnG4LjEtZP6Ycs7_0Qz_XiBNVN-S_fCTA3aAwu6u8hjr4l9eO_zMuYSgn9dlGTBoRPb0PWHzrGppt1vBQ02WOZGKjrF2M-jllxOWJOBPZixfDGDVhjDbmIxS3736ZOrOc8kUJOODPhWX6YTwe0tIvXrkSolDYwgqVISFrWBn'
@@ -223,7 +216,6 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-// CONSOLIDATED INITIALIZATION HANDLER
 window.onload = () => {
     populateVoices();
     
@@ -287,7 +279,6 @@ function startLearning() {
     goToStage(2);
 }
 
-// RESTORED STAGE MANAGEMENT
 function goToStage(n) {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('stage' + n).classList.add('active');
