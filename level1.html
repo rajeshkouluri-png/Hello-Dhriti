@@ -120,29 +120,28 @@
     // అత్యంత పవర్‌ఫుల్ ఆడియో ఫంక్షన్ (యాప్స్ కోసం ప్రత్యేకంగా)
     // Kodular యాప్ కోసం పర్ఫెక్ట్ ఆడియో ట్రిక్ (DOM Audio)
 // యాప్స్ (iframes) కోసం పర్ఫెక్ట్ ఆడియో బూస్ట్ ట్రిక్
-    function speak(txt) {
+function speak(txt) {
         try {
-            let url = "https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=te&q=" + encodeURIComponent(txt);
-            let player = document.getElementById("appAudioPlayer");
+            // మొబైల్ సిస్టమ్ వాయిస్ ద్వారా చదివించడం (ఇది ఎప్పటికీ బ్లాక్ అవ్వదు)
+            if ('speechSynthesis' in window) {
+                // పాత వాయిస్ ఏమైనా ఉంటే ఆపేయాలి
+                window.speechSynthesis.cancel();
+                
+                // చిన్న బ్రేక్ (Timeout) ఇచ్చి కొత్త వాయిస్ మొదలుపెట్టాలి
+                setTimeout(() => {
+                    let u = new SpeechSynthesisUtterance(txt);
+                    u.lang = 'te-IN'; // తెలుగు భాష
+                    u.rate = 0.8;     // కొంచెం నెమ్మదిగా పిల్లలకు అర్థమయ్యేలా
+                    window.speechSynthesis.speak(u);
+                }, 100); // 100 మిల్లీసెకన్ల గ్యాప్
+            }
             
-            player.src = url;
-            player.load(); // ఇది కొత్తగా చేర్చాం, ఆడియోను ఫోర్స్ చేసి రెడీ చేస్తుంది
-            
-            let playPromise = player.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(function(error) {
-                    console.log("App Blocked Audio, Fallback to System Voice", error);
-                    if ('speechSynthesis' in window) {
-                        window.speechSynthesis.cancel();
-                        let u = new SpeechSynthesisUtterance(txt);
-                        u.lang = 'te-IN';
-                        u.rate = 0.8;
-                        window.speechSynthesis.speak(u);
-                    }
-                });
+            // ఇది కోడులార్‌కి సిగ్నల్ పంపే బ్యాకప్ (ఒకవేళ పైది ఫెయిల్ అయితే)
+            if (window.parent) {
+                window.parent.postMessage({ type: "playAudio", text: txt }, "*");
             }
         } catch (e) {
-            console.log("Audio completely failed.");
+            console.log("Audio failed:", e);
         }
     }
     // స్పీకర్ బటన్ నొక్కినప్పుడు ఆడియో మళ్ళీ ప్లే చేయడానికి
@@ -163,23 +162,35 @@
         if(n === 3) loadScramble();
     }
 
-    function loadId() {
+function loadId() {
         if(qIdx >= targetSet.length) {
             document.getElementById('id-grid').innerHTML = '';
             document.getElementById('stage2-feedback').style.display = 'block';
             return;
         }
+        
         const target = targetSet[qIdx];
-        speak(target);
+        
+        // కొత్త అక్షరం చదవడానికి అర సెకను టైమ్ (Delay) ఇస్తున్నాం
+        setTimeout(() => {
+            speak(target);
+        }, 500); 
+
         const grid = document.getElementById('id-grid');
         grid.innerHTML = '';
+        
         [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5).forEach(l => {
             const t = document.createElement('div');
             t.className = 'tile'; t.innerText = l;
             t.onclick = () => {
                 totalAttempts++;
-                if(l === target) { qIdx++; loadId(); }
-                else { speak(target); }
+                if(l === target) { 
+                    qIdx++; 
+                    loadId(); // కరెక్ట్ అయితే నెక్స్ట్ అక్షరం వస్తుంది
+                }
+                else { 
+                    speak(target); // రాంగ్ అయితే మళ్లీ పాత అక్షరమే చదువుతుంది
+                }
             };
             grid.appendChild(t);
         });
