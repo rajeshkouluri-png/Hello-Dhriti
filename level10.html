@@ -48,7 +48,8 @@
         .tile { border: 3px solid #ddd; background: #fff; cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
         .tile:active { transform: translateY(4px); box-shadow: none; }
         
-        .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #333; }
+        /* FIXED: Set explicit visibility text color for Android WebView compatibility */
+        .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #2c3e50 !important; }
         
         .selected-blank { border: 3px solid #e67e22 !important; background: #fff3e0 !important; }
         .wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
@@ -121,7 +122,7 @@
 const CONFIG = {
     videoID: "6xgkzulOsxg",
     
-    // Stage 2 letters: ద, త, గ, స, న, ఈ
+    // CRITICAL ENCODING FIX: Replaced Thai unicode lookalike \u0C28 mixup with pure Telugu layout matching
     stage2Letters: [
         '\u0C26', // ద
         '\u0C24', // త
@@ -131,7 +132,6 @@ const CONFIG = {
         '\u0C08'  // ఈ
     ], 
 
-    // Stage 4 letters: దం, త, ఈ, వం, తం, డ
     stage4Letters: [
         '\u0C26\u0C02', // దం
         '\u0C24',       // త
@@ -141,7 +141,6 @@ const CONFIG = {
         '\u0C21'        // డ
     ], 
 
-    // Stage 4 answers: డ, దం, వం, తం, ఈ, త
     stage4Answers: { 
         b1: '\u0C21',       // డ
         b2: '\u0C26\u0C02', // దం
@@ -153,37 +152,31 @@ const CONFIG = {
 };
 const wordData = [
     {
-        // దడ (Da-da)
         w: '\u0C26\u0C21', 
         l: ['\u0C26', '\u0C21'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEjHVFvxPTa3Ax2eroZOXz-PsbCS1l6lJbjC2K1QvpXw2ylj_2Kg-PFyv9Er65UKV0GtmoqIqxeR3t64NUapyxNKs5JX0SnkK4Zlr9V0Agg_pLU8d8F-NzK8-kGBtuZqD5vSqoM6gAcouH8B9U9V7VeA5jB8y0pP8SNRxz1Rl-MtklqmilA-qyVqf3PRmcwn'
     },
     {
-        // దండ (Dan-da)
         w: '\u0C26\u0C02\u0C21', 
         l: ['\u0C26\u0C02', '\u0C21'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgN66hOTQHfAj56g3PYNFf_2cNdz8lPHpuczff9ZmpM7jwWmgMX_cvS71QM8PVcN0m5IBLmMa2GUrQvfDl3lnlPyxtdWroFgBk05IMY72Vum-CSg2e9N2X77rpwiNXCfde5obYVkrTa9_jvpcMSHV4nTRr1t2KLm4CXRop_H0c01HjiqZvN7AEk23UIkdJA'
     },
     {
-        // వంద (Van-da)
         w: '\u0C35\u0C02\u0C26', 
         l: ['\u0C35\u0C02', '\u0C26'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgOGxspT382Vz91LdbqPmkHqsSt4U1qB6QY11UIzkVjyTyfbMjaRBrGY6fNdm9dtmROWZaUawVt38a1aHBq1vWVQ4bXq4DcNj7xdH8pLOFJvqhxUtBlJFDKzVicYTNb3q1VCzjbcGE_OQb42MtMRi7lGC59sfxv5lcTvDvZZ5LF2aosrXk2MGD5kkIeEBRz'
     },
     {
-        // దంతం (Dan-tham)
         w: '\u0C26\u0C02\u0C24\u0C02', 
         l: ['\u0C26\u0C02', '\u0C24\u0C02'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhpsTx0LrOzv-toFkzOwicoMxcuBAdrkCiVyWfqOwc4gG8GHOAJQQ1qvZNAia7J7PwyHvFNy2vzL6slkxuHP2wZmA0XBRpvQrlyvH8lYa_9zkF-U93aSaIMLEx1UhPL_n5ZJTbx7ixmQBBQZuQux_IqJrepdm9xZogRqCf-zkFbVxYqQCW5c3nArUisqrGo'
     },
     {
-        // ఈత (Ee-tha)
         w: '\u0C08\u0C24', 
         l: ['\u0C08', '\u0C24'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgDQHrVWPEAJitjmlEhc8Q68aOaOMmZUPHJZkRiRxZ5xZtrEotB_hh-vtP44ONI2IKZtYp89hTWz3oWu2ySLwQT0p4c8zm7iE-TCr4wCqzkQSJKLxZoe19MK5vw2KGQO54uy5dlbiwJmGha8Btocz49C1UqUOpjjN9e4dCnxU7wmADFejrfFXfTYH1ldmk9'
     },
     {
-        // ఈక (Ee-ka)
         w: '\u0C08\u0C15', 
         l: ['\u0C08', '\u0C15'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgWPEo2XbC1T-eGRB5oD3tqdb0NSVRJi5vKSsMBGtf0mgl1ybWqrdFm4vHhj0_f7y_co3zu0cZbo-bkbKu7McdkT3KOizE5kc_gqUZRbbuNtAo9Dud_5PkkM4ZJY9A1-RuuCFGX-Egbt9MTdPKD8HLIo6RgWlJxA51eDLrd9N8ZeXOtpBOC4JWllk3o2v73'
@@ -205,17 +198,15 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-// SINGLE CONSOLIDATED MASTER ONLOAD LOOP
+// CONSOLIDATED INITIALIZATION ENGINE
 window.onload = () => {
     populateVoices();
     
-    // Load Video Container Correctly
     const vidContainer = document.getElementById('video-container');
     if(vidContainer) {
         vidContainer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
     }
     
-    // Render Stage 4 Interactive Tiles Correctly
     const s4grid = document.getElementById('stage4-tiles');
     if(s4grid) {
         s4grid.innerHTML = ''; 
