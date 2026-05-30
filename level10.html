@@ -148,6 +148,7 @@ const CONFIG = {
         b6: '\u0C24'        // త
     }
 };
+
 const wordData = [
     {
         w: '\u0C26\u0C21', 
@@ -188,35 +189,35 @@ let wordIdx = 0;
 
 const targetSet = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
-let synthVoices = [];
-function populateVoices() {
-    synthVoices = window.speechSynthesis.getVoices();
-}
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoices;
-}
-
-// FIXED: Master single execution initialization handler sequence
+// Structural Match with Level 9 Implementation Loop
 window.onload = () => {
-    populateVoices();
-    
-    const vidContainer = document.getElementById('video-container');
-    if(vidContainer) {
-        vidContainer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
-    }
+    document.getElementById('video-container').innerHTML = `<iframe id="lesson-video" width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
     
     const s4grid = document.getElementById('stage4-tiles');
-    if(s4grid) {
-        s4grid.innerHTML = ''; 
-        CONFIG.stage4Letters.forEach(l => {
-            const t = document.createElement('div');
-            t.className = 'tile'; 
-            t.innerText = l;
-            t.onclick = () => fillSelected(l);
-            s4grid.appendChild(t);
-        });
-    }
+    s4grid.innerHTML = ''; 
+    CONFIG.stage4Letters.forEach(l => {
+        const t = document.createElement('div');
+        t.className = 'tile'; 
+        t.innerText = l;
+        t.onclick = () => fillSelected(l);
+        s4grid.appendChild(t);
+    });
 };
+
+let synthVoices = [];
+function populateVoices() {
+    try {
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            synthVoices = window.speechSynthesis.getVoices();
+        }
+    } catch(e) {
+        console.log("Voice buffer mapping skipped");
+    }
+}
+
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoices;
+}
 
 function speak(txt) {
     try {
@@ -227,7 +228,7 @@ function speak(txt) {
             window.parent.postMessage({ type: "playAudio", text: txt }, "*");
         }
 
-        if ('speechSynthesis' in window) {
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             setTimeout(() => {
                 let u = new SpeechSynthesisUtterance(txt);
@@ -248,10 +249,12 @@ function replayAudio() {
 }
 
 function startLearning() {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.resume();
-        let silentUtterance = new SpeechSynthesisUtterance("");
-        window.speechSynthesis.speak(silentUtterance);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+            window.speechSynthesis.resume();
+            let silentUtterance = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(silentUtterance);
+        } catch(e) {}
     }
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
@@ -343,7 +346,6 @@ function selectBlank(n) {
     document.getElementById('b'+n).classList.add('selected-blank');
 }
 
-// FIXED: Embedded look-ahead focus matching routine to handle empty indices safely inside app sandboxes
 function fillSelected(l) {
     if (!activeBlank) {
         for (let i = 1; i <= 6; i++) {
