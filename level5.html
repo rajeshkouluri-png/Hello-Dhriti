@@ -1,9 +1,9 @@
 <html lang="te">
 <head>
-    <meta charset="UTF-8"></meta>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>పాఠం -5 అభ్యాసన దీపిక</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&amp;display=swap" rel="stylesheet"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Ramabhadra', 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 10px; }
         #lms-container { max-width: 600px; margin: 20px auto; border: 3px solid #2980b9; padding: 25px; border-radius: 20px; background: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -50,7 +50,7 @@
 
     <div class="stage" id="stage2">
         <h3>Step 2: Identify the Letter</h3>
-        <p>Listen carefully and click the letter</p>
+        <p>Listen carefully and click the letter <button onclick="replayAudio()" style="background:none; border:none; font-size:24px; cursor:pointer; outline:none;" title="Play Sound">🔊</button></p>
         <div class="tile-grid" id="id-grid"></div>
         <div class="feedback-box" id="stage2-feedback">
             <h3 style="color: #27ae60;">Well Done!</h3>
@@ -98,7 +98,7 @@ const CONFIG = {
     videoID: "gRHTiwr_TYk",
     stage2Letters: ['\u0C05', '\u0C30', '\u0C15', '\u0C2C', '\u0C24', '\u0C09'], 
     stage4Letters: ['\u0C21\u0C02', '\u0C2C', '\u0C05', '\u0C24', '\u0C30', '\u0C05\u0C02'], 
-    stage4Answers: { b1: '\u0C05', b2: '\u0C30', b6: '\u0C21\u0C02', b3: '\u0C05\u0C02', b4: '\u0C2C', b5: '\u0C24' }, 
+    stage4Answers: { b1: '\u0C05', b2: '\u0C30', b6: '\u0C21\u0C02', b3: '\u0C05\u0C02', b4: '\u0C2C', b5: '\u0C24' } 
 };
 
 const wordData = [
@@ -116,29 +116,30 @@ let qIdx = 0;
 let wordIdx = 0;
 const targetSet = [...CONFIG.stage2Letters, ...CONFIG.stage2Letters].sort(() => Math.random() - 0.5).slice(0, 6);
 
-// Pre-load voices robustly for all devices
-let synthVoices = [];
-function populateVoices() {
-    synthVoices = window.speechSynthesis.getVoices();
-}
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoices;
-}
-// Call immediately in case they are already loaded
-populateVoices();
+// CRITICAL FIX: Run the window loader loop to draw Stage 4 clickable tiles
+window.onload = () => {
+    document.getElementById('video-container').innerHTML = `<iframe id="lesson-video" width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
+    
+    const s4grid = document.getElementById('stage4-tiles');
+    s4grid.innerHTML = ''; // Clear out past items
+    CONFIG.stage4Letters.forEach(l => {
+        const t = document.createElement('div');
+        t.className = 'tile'; 
+        t.innerText = l;
+        t.onclick = () => fillSelected(l);
+        s4grid.appendChild(t);
+    });
+};
 
 function speak(txt) {
     try {
-        // 1. Tells your Kodular app to speak the letter
         if (window.AppInventor) {
             window.AppInventor.setWebViewString(txt);
         } 
-        // 2. Parent iframe backup
         else if (window.parent) {
             window.parent.postMessage({ type: "playAudio", text: txt }, "*");
         }
 
-        // 3. Browser Fallback (For your Blogger site)
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             setTimeout(() => {
@@ -152,14 +153,20 @@ function speak(txt) {
         console.log("Audio native routing failed:", e);
     }
 }
+
+function replayAudio() {
+    if (qIdx < targetSet.length) {
+        speak(targetSet[qIdx]);
+    }
+}
+
 function startLearning() {
-    // CRITICAL FIX: Unlock audio engine directly on user click
-    window.speechSynthesis.resume();
-    
-    // Play a silent utterance to force the browser to accept TTS permissions
-    let silentUtterance = new SpeechSynthesisUtterance("");
-    silentUtterance.volume = 0;
-    window.speechSynthesis.speak(silentUtterance);
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.resume();
+        let silentUtterance = new SpeechSynthesisUtterance("");
+        silentUtterance.volume = 0;
+        window.speechSynthesis.speak(silentUtterance);
+    }
     
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
@@ -179,8 +186,6 @@ function loadId() {
         return;
     }
     const target = targetSet[qIdx];
-    
-    // Add small delay to ensure stage transition is done before speaking
     setTimeout(() => speak(target), 300);
 
     const grid = document.getElementById('id-grid');
@@ -257,8 +262,13 @@ function checkStage4() {
     let allCorrect = true;
     for(let k in CONFIG.stage4Answers) {
         const el = document.getElementById(k);
-        if(el.innerText === CONFIG.stage4Answers[k]) el.className = 'drop-zone correct';
-        else { el.className = 'drop-zone wrong'; allCorrect = false; }
+        // Normalize comparison values to eliminate subtle spacing bugs
+        if(el.innerText.trim() === CONFIG.stage4Answers[k].trim()) {
+            el.className = 'drop-zone correct';
+        } else { 
+            el.className = 'drop-zone wrong'; 
+            allCorrect = false; 
+        }
     }
     if(allCorrect) {
         document.getElementById('check-btn').style.display = 'none';
@@ -277,17 +287,13 @@ function showFinalScore() {
     
     document.getElementById('star-display').innerHTML = stars;
     document.getElementById('final-eval-text').innerText = msgs[rating];
-
-    // --- FIXED COMBINED HANDSHAKE ---
     
-    // 1. ALWAYS fire the postMessage so your hub.html catches it, saves to Firebase, and blinks the return tab!
     try {
         window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
     } catch(e) {
         console.log("hub.html communication failed:", e);
     }
 
-    // 2. ALSO notify Kodular just in case you ever want to track scores inside app blocks
     try {
         if (window.AppInventor) {
             window.AppInventor.setWebViewString("Score:" + rating);
