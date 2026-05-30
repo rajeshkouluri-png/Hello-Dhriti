@@ -131,14 +131,31 @@
         });
     };
 
-    function speak(txt) {
-        window.speechSynthesis.cancel();
-        setTimeout(() => {
-            const u = new SpeechSynthesisUtterance(txt);
-            u.lang = 'te-IN'; u.rate = 0.6; 
-            window.speechSynthesis.speak(u);
-        }, 50);
+   function speak(txt) {
+    try {
+        // 1. Tells your Kodular app to speak the letter
+        if (window.AppInventor) {
+            window.AppInventor.setWebViewString(txt);
+        } 
+        // 2. Parent iframe backup
+        else if (window.parent) {
+            window.parent.postMessage({ type: "playAudio", text: txt }, "*");
+        }
+
+        // 3. Browser Fallback (For your Blogger site)
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setTimeout(() => {
+                let u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'te-IN';
+                u.rate = 0.75; 
+                window.speechSynthesis.speak(u);
+            }, 100);
+        }
+    } catch (e) {
+        console.log("Audio native routing failed:", e);
     }
+}
 
     function startLearning() {
         document.getElementById('video-container').innerHTML = ""; 
@@ -241,22 +258,33 @@
     }
 
     function showFinalScore() {
-        document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
-        document.getElementById('finish').classList.add('active');
-        let rating = 1; let msg = "";
-        if(totalAttempts <= 35) { rating = 5; msg = "Perfect Mastery!"; }
-        else if(totalAttempts <= 45) { rating = 4; msg = "Great Job!"; }
-        else { rating = 3; msg = "Keep Practicing!"; }
-        let stars = "";
-        for(let i=1; i<=5; i++) {
-            stars += (i <= rating) ? '<span class="star-filled">\u2605</span>' : '<span class="star-empty">\u2606</span>';
-        }
-        document.getElementById('star-display').innerHTML = stars;
-        document.getElementById('final-eval-text').innerText = msg;
+    document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+    document.getElementById('finish').classList.add('active');
+    
+    let rating = (totalAttempts <= 30) ? 5 : (totalAttempts <= 35) ? 4 : (totalAttempts <= 40) ? 3 : (totalAttempts <= 45) ? 2 : 1;
+    let msgs = ["", "Try Again!", "Keep Practicing!", "Good Effort!", "Great Job!", "Perfect Mastery!"];
+    let stars = "";
+    for (let i = 1; i <= 5; i++) stars += (i <= rating) ? '<span class="star-filled">\u2605</span>' : '<span class="star-empty">\u2606</span>';
+    
+    document.getElementById('star-display').innerHTML = stars;
+    document.getElementById('final-eval-text').innerText = msgs[rating];
 
-        // AUTOMATION: Beams the calculated rating silently to the main blog!
-    window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+    // --- FIXED COMBINED HANDSHAKE ---
+    
+    // 1. ALWAYS fire the postMessage so your hub.html catches it, saves to Firebase, and blinks the return tab!
+    try {
+        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+    } catch(e) {
+        console.log("hub.html communication failed:", e);
     }
+
+    // 2. ALSO notify Kodular just in case you ever want to track scores inside app blocks
+    try {
+        if (window.AppInventor) {
+            window.AppInventor.setWebViewString("Score:" + rating);
+        }
+    } catch(e) { }
+}
 </script>
 </body>
 </html>
