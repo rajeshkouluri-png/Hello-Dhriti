@@ -3,7 +3,7 @@
     <meta charset="UTF-8"></meta>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
     <title>పాఠం -6  అభ్యాసన దీపిక</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&amp;display=swap" rel="stylesheet"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&display=swap" rel="stylesheet"></link>
     <style>
         body { font-family: 'Ramabhadra', 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 10px; }
         #lms-container { max-width: 600px; margin: 20px auto; border: 3px solid #2980b9; padding: 25px; border-radius: 20px; background: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -50,7 +50,7 @@
 
     <div class="stage" id="stage2">
         <h3>Step 2: Identify the Letter</h3>
-        <p>Listen carefully and click the letter</p>
+        <p>Listen carefully and click the letter <button onclick="replayAudio()" style="background:none; border:none; font-size:24px; cursor:pointer; outline:none;" title="Play Sound">🔊</button></p>
         <div class="tile-grid" id="id-grid"></div>
         <div class="feedback-box" id="stage2-feedback">
             <h3 style="color: #27ae60;">Well Done!</h3>
@@ -97,9 +97,7 @@
 const CONFIG = {
     videoID: "YFi5-wMh9lA", 
     stage2Letters: ['\u0C2C', '\u0C1C', '\u0C30', '\u0C09', '\u0C24', '\u0C35'], 
-    // These are the tiles the user clicks:
     stage4Letters: ['\u0C32', '\u0C05', '\u0C21', '\u0C1C', '\u0C32\u0C02', '\u0C30\u0C02'], 
-    // These are the correct answers in order (b1 to b6):
     stage4Answers: { 
         b1: '\u0C32',   // ల
         b2: '\u0C05',   // అ
@@ -124,30 +122,32 @@ let activeBlank = null;
 let qIdx = 0;
 let wordIdx = 0;
 
-// Update: Create a shuffled list of all 6 unique letters
-// This ensures every letter is asked exactly once.
 const targetSet = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
-let synthVoices = [];
-function populateVoices() {
-    synthVoices = window.speechSynthesis.getVoices();
-}
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoices;
-}
+// CRITICAL FIX: Run the window loader loop to build out Stage 4's selection deck
+window.onload = () => {
+    document.getElementById('video-container').innerHTML = `<iframe id="lesson-video" width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
+    
+    const s4grid = document.getElementById('stage4-tiles');
+    s4grid.innerHTML = ''; 
+    CONFIG.stage4Letters.forEach(l => {
+        const t = document.createElement('div');
+        t.className = 'tile'; 
+        t.innerText = l;
+        t.onclick = () => fillSelected(l);
+        s4grid.appendChild(t);
+    });
+};
 
 function speak(txt) {
     try {
-        // 1. Tells your Kodular app to speak the letter
         if (window.AppInventor) {
             window.AppInventor.setWebViewString(txt);
         } 
-        // 2. Parent iframe backup
         else if (window.parent) {
             window.parent.postMessage({ type: "playAudio", text: txt }, "*");
         }
 
-        // 3. Browser Fallback (For your Blogger site)
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             setTimeout(() => {
@@ -162,10 +162,18 @@ function speak(txt) {
     }
 }
 
+function replayAudio() {
+    if (qIdx < targetSet.length) {
+        speak(targetSet[qIdx]);
+    }
+}
+
 function startLearning() {
-    window.speechSynthesis.resume();
-    let silentUtterance = new SpeechSynthesisUtterance("");
-    window.speechSynthesis.speak(silentUtterance);
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.resume();
+        let silentUtterance = new SpeechSynthesisUtterance("");
+        window.speechSynthesis.speak(silentUtterance);
+    }
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
@@ -177,28 +185,20 @@ function goToStage(n) {
     if(n === 3) loadScramble();
 }
 
-// Logic updated to cycle through all 6 letters without repeating or leaving any out
 function loadId() {
     const grid = document.getElementById('id-grid');
     const feedbackBox = document.getElementById('stage2-feedback');
     
-    // Check if we have completed all 6 letters
     if(qIdx >= targetSet.length) {
         grid.innerHTML = '';
         feedbackBox.style.display = 'block';
         return;
     }
 
-    // Get the current target letter from the shuffled 6-letter set
     const target = targetSet[qIdx];
-    
-    // Slight delay to allow the UI to refresh before speaking
     setTimeout(() => speak(target), 500);
 
-    // Clear and Redraw the grid with a NEW random order
     grid.innerHTML = '';
-    
-    // Create a fresh shuffled array of the 6 letters for the UI tiles
     const displayTiles = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
     displayTiles.forEach(letter => {
@@ -209,25 +209,20 @@ function loadId() {
         t.onclick = () => {
             totalAttempts++;
             if(letter === target) { 
-                // Visual feedback for correct answer
                 t.style.background = "#d4edda";
                 t.style.borderColor = "#28a745";
-                
-                // Move to the next index in the 6-letter sequence
                 qIdx++; 
-                
-                // Refresh the whole grid (Randomize positions for the next turn)
                 setTimeout(loadId, 800); 
             } else { 
-                // Visual feedback for wrong answer
                 t.classList.add('wrong');
-                speak(target); // Repeat the target letter if they miss
+                speak(target); 
                 setTimeout(() => t.classList.remove('wrong'), 500);
             }
         };
         grid.appendChild(t);
     });
 }
+
 function loadScramble() {
     if(wordIdx >= wordData.length) {
         document.getElementById('image-container').innerHTML = "";
@@ -281,8 +276,12 @@ function checkStage4() {
     let allCorrect = true;
     for(let k in CONFIG.stage4Answers) {
         const el = document.getElementById(k);
-        if(el.innerText === CONFIG.stage4Answers[k]) el.className = 'drop-zone correct';
-        else { el.className = 'drop-zone wrong'; allCorrect = false; }
+        if(el.innerText.trim() === CONFIG.stage4Answers[k].trim()) {
+            el.className = 'drop-zone correct';
+        } else { 
+            el.className = 'drop-zone wrong'; 
+            allCorrect = false; 
+        }
     }
     if(allCorrect) {
         document.getElementById('check-btn').style.display = 'none';
@@ -301,17 +300,13 @@ function showFinalScore() {
     
     document.getElementById('star-display').innerHTML = stars;
     document.getElementById('final-eval-text').innerText = msgs[rating];
-
-    // --- FIXED COMBINED HANDSHAKE ---
     
-    // 1. ALWAYS fire the postMessage so your hub.html catches it, saves to Firebase, and blinks the return tab!
     try {
         window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
     } catch(e) {
         console.log("hub.html communication failed:", e);
     }
 
-    // 2. ALSO notify Kodular just in case you ever want to track scores inside app blocks
     try {
         if (window.AppInventor) {
             window.AppInventor.setWebViewString("Score:" + rating);
