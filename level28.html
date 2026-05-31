@@ -1,9 +1,9 @@
 <html lang="te">
 <head>
-    <meta charset="UTF-8"></meta>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Learn Telugu Online: "ట్ట" ఒత్తు పదాలు - Interactive Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&amp;display=swap" rel="stylesheet"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Ramabhadra', 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 10px; }
         #lms-container { max-width: 700px; margin: 20px auto; border: 3px solid #2980b9; padding: 25px; border-radius: 20px; background: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -103,126 +103,37 @@ let totalAttempts = 0; // Tracks every click for Star Rating
 const CONFIG = {
     // STAGE 2
     stage2Sentences: [
-        { 
-            // చెట్టు మీద చిట్టి చిలుక.
-            text: "\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41 \u0C2E\u0C40\u0C26 \u0C1A\u0C3F\u0C1F\u0C4D\u0C1F\u0C3F \u0C1A\u0C3F\u0C32\u0C41\u0C15.", 
-            targets: ["\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1A\u0C3F\u0C1F\u0C4D\u0C1F\u0C3F"] 
-        },
-        { 
-            // పిట్ట కొంచం కూత ఘనం.
-            text: "\u0C2A\u0C3F\u0C1F\u0C4D\u0C1F \u0C15\u0C4A\u0C02\u0C1A\u0C02 \u0C15\u0C42\u0C24 \u0C18\u0C28\u0C02.", 
-            targets: ["\u0C2A\u0C3F\u0C1F\u0C4D\u0C1F"] 
-        }
+        { text: "\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41 \u0C2E\u0C40\u0C26 \u0C1A\u0C3F\u0C1F\u0C4D\u0C1F\u0C3F \u0C1A\u0C3F\u0C32\u0C41\u0C15.", targets: ["\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1A\u0C3F\u0C1F\u0C4D\u0C1F\u0C3F"] },
+        { text: "\u0C2A\u0C3F\u0C1F\u0C4D\u0C1F \u0C15\u0C4A\u0C02\u0C1A\u0C02 \u0C15\u0C42\u0C24 \u0C18\u0C28\u0C02.", targets: ["\u0C2A\u0C3F\u0C1F\u0C4D\u0C1F"] }
     ],
 
     // STAGE 3
     wordData: [
-        { 
-            // గట్టు
-            w: '\u0C17\u0C1F\u0C4D\u0C1F\u0C41', 
-            l: ['\u0C17', '\u0C1F\u0C4D\u0C1F\u0C41'], 
-            img: 'https://blogger.googleusercontent.com/img/a/AVvXsEjdsufZu34iuq6RkAyeIePWstzRvLUBT-60Gfc0pIcjXmv_yvWS71Ksc965-CBKDW9O_PkeL_6F4Ix8wS5Eowke2UBcfNqaHt86t31WJVmQebL85XXY1Jh5Ja52dZPt9wALWPOEfUA4l1hLSuzNZMDjCA2LnOjk1Fn9HotIfUkbRBvGWefGcCsj2P01vj1o' 
-        },
-        { 
-            // పట్టణం
-            w: '\u0C2A\u0C1F\u0C4D\u0C1F\u0C23\u0C02', 
-            l: ['\u0C2A', '\u0C1F\u0C4D\u0C1F', '\u0C23\u0C02'], 
-            img: 'https://blogger.googleusercontent.com/img/a/AVvXsEh-4d1tqkT4yXSVzkeNb3kubUnJIQ8jWtdr6W0JMtkbovMOgSKYF9S5Hx93Ipl7B-NMs0sd2HA5LGxTFniPHlh8haMMKjBEjV2qHWfWMR9Z0WbYAcE0XraTwAkQmvAa8VtHEQLaFC30AB2Pw7ZvfYMIxuW5E0wClbe69iy-WfPlbs8dWEwGcEH6YYKMDxBB' 
-        },
-        { 
-            // చిట్టెలుక
-            w: '\u0C1A\u0C3F\u0C1F\u0C4D\u0C1F\u0C46\u0C32\u0C41\u0C15', 
-            l: ['\u0C1A\u0C3F', '\u0C1F\u0C4D\u0C1F\u0C46', '\u0C32\u0C41', '\u0C15'], 
-            img: 'https://blogger.googleusercontent.com/img/a/AVvXsEiH-kcf15wNR3A4RAqTDjpzric8-YxOSWrg6OYJ-g5OY1xMlKEA6dnrZGq2nGW7RJZc9Sinenw049wC64P2cA8xlIoYcOK67iRigDsrg2_hpayt8e4c76GjfmEYhs7IhrmuVK3sY1hDtS4GHEosWgXyudHRaRtfTAOl2JPlgGjDJN7DelQjQtsEW2C8h6iP' 
-        },
-        { 
-            // పిట్ట
-            w: '\u0C2A\u0C3F\u0C1F\u0C4D\u0C1F', 
-            l: ['\u0C2A\u0C3F', '\u0C1F\u0C4D\u0C1F'], 
-            img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhck5H33xYDC7raWBjAzrTFavRqqFXTXDkP6wdFWXzn4xZVZHReS2qbw4_mjTF103TnTWvv5SkTqLfnTh4Ovxtk96VGRlSAU6q3aFicZDEmcC7q2Wi_CL7XdVQKb4-AHP1gLsWrgJRvBTgndzih0qo9mFRDUTnP3xxsaYSX4qrQSJ9JyadScAdOkPQNKTz8' 
-        },
-        { 
-            // చెట్టు
-            w: '\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41', 
-            l: ['\u0C1A\u0C46', '\u0C1F\u0C4D\u0C1F\u0C41'], 
-            img: 'https://blogger.googleusercontent.com/img/a/AVvXsEi0wlFYLZ9CcGRaTg6ht5i73zltIY3dim9N6oOJ08jG0TOJDT-9H2AaqKp2nn83YuGwS5Ru-LWjrzWg6aQl6xMxlV9QSQdnM9uBDTHnud7_XsRzvwaYTkoZr9j0tkNkTHrXhP4TMnJtbrpa5aSupF6TPgFmgTW4pco_GLjqcYAVvU0Z0qCmT3rWWB_DhBYG' 
-        }
+        { w: '\u0C17\u0C1F\u0C4D\u0C1F\u0C41', l: ['\u0C17', '\u0C1F\u0C4D\u0C1F\u0C41'], img: 'https://blogger.googleusercontent.com/img/a/AVvXsEjdsufZu34iuq6RkAyeIePWstzRvLUBT-60Gfc0pIcjXmv_yvWS71Ksc965-CBKDW9O_PkeL_6F4Ix8wS5Eowke2UBcfNqaHt86t31WJVmQebL85XXY1Jh5Ja52dZPt9wALWPOEfUA4l1hLSuzNZMDjCA2LnOjk1Fn9HotIfUkbRBvGWefGcCsj2P01vj1o' },
+        { w: '\u0C2A\u0C1F\u0C4D\u0C1F\u0C23\u0C02', l: ['\u0C2A', '\u0C1F\u0C4D\u0C1F', '\u0C23\u0C02'], img: 'https://blogger.googleusercontent.com/img/a/AVvXsEh-4d1tqkT4yXSVzkeNb3kubUnJIQ8jWtdr6W0JMtkbovMOgSKYF9S5Hx93Ipl7B-NMs0sd2HA5LGxTFniPHlh8haMMKjBEjV2qHWfWMR9Z0WbYAcE0XraTwAkQmvAa8VtHEQLaFC30AB2Pw7ZvfYMIxuW5E0wClbe69iy-WfPlbs8dWEwGcEH6YYKMDxBB' },
+        { w: '\u0C1A\u0C3F\u0C1F\u0C4D\u0C1F\u0C46\u0C32\u0C41\u0C15', l: ['\u0C1A\u0C3F', '\u0C1F\u0C4D\u0C1F\u0C46', '\u0C32\u0C41', '\u0C15'], img: 'https://blogger.googleusercontent.com/img/a/AVvXsEiH-kcf15wNR3A4RAqTDjpzric8-YxOSWrg6OYJ-g5OY1xMlKEA6dnrZGq2nGW7RJZc9Sinenw049wC64P2cA8xlIoYcOK67iRigDsrg2_hpayt8e4c76GjfmEYhs7IhrmuVK3sY1hDtS4GHEosWgXyudHRaRtfTAOl2JPlgGjDJN7DelQjQtsEW2C8h6iP' },
+        { w: '\u0C2A\u0C3F\u0C1F\u0C4D\u0C1F', l: ['\u0C2A\u0C3F', '\u0C1F\u0C4D\u0C1F'], img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhck5H33xYDC7raWBjAzrTFavRqqFXTXDkP6wdFWXzn4xZVZHReS2qbw4_mjTF103TnTWvv5SkTqLfnTh4Ovxtk96VGRlSAU6q3aFicZDEmcC7q2Wi_CL7XdVQKb4-AHP1gLsWrgJRvBTgndzih0qo9mFRDUTnP3xxsaYSX4qrQSJ9JyadScAdOkPQNKTz8' },
+        { w: '\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41', l: ['\u0C1A\u0C46', '\u0C1F\u0C4D\u0C1F\u0C41'], img: 'https://blogger.googleusercontent.com/img/a/AVvXsEi0wlFYLZ9CcGRaTg6ht5i73zltIY3dim9N6oOJ08jG0TOJDT-9H2AaqKp2nn83YuGwS5Ru-LWjrzWg6aQl6xMxlV9QSQdnM9uBDTHnud7_XsRzvwaYTkoZr9j0tkNkTHrXhP4TMnJtbrpa5aSupF6TPgFmgTW4pco_GLjqcYAVvU0Z0qCmT3rWWB_DhBYG' }
     ],
 
     // STAGE 4
     stage4Data: [
-        { prefix: "\u0C1A\u0C46", suffix: "", options: ["\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1F\u0C4D\u0C1F\u0C3F"], answer: "\u0C1F\u0C4D\u0C1F\u0C41" }, // చెట్టు
-        { prefix: "\u0C2A\u0C3F", suffix: "", options: ["\u0C1F\u0C4D\u0C1F\u0C3F", "\u0C1F\u0C4D\u0C1F"], answer: "\u0C1F\u0C4D\u0C1F" }, // పిట్ట
-        { prefix: "\u0C2C\u0C4A", suffix: "", options: ["\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1F\u0C4D\u0C1F\u0C3F"], answer: "\u0C1F\u0C4D\u0C1F\u0C41" }, // బొట్టు
-        { prefix: "\u0C15\u0C4B\u0C21\u0C3F\u0C2A\u0C46", suffix: "", options: ["\u0C1F\u0C4D\u0C1F", "\u0C1F\u0C4D\u0C1F\u0C41"], answer: "\u0C1F\u0C4D\u0C1F" }, // కోడిపెట్ట
-        { prefix: "\u0C2A", suffix: "\u0C23\u0C02", options: ["\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1F\u0C4D\u0C1F"], answer: "\u0C1F\u0C4D\u0C1F" } // పట్టణం
+        { prefix: "\u0C1A\u0C46", options: ["\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1F\u0C4D\u0C1F\u0C3F"], answer: "\u0C1F\u0C4D\u0C1F\u0C41" },
+        { prefix: "\u0C2A\u0C3F", options: ["\u0C1F\u0C4D\u0C1F\u0C3F", "\u0C1F\u0C4D\u0C1F"], answer: "\u0C1F\u0C4D\u0C1F" },
+        { prefix: "\u0C2C\u0C4A", options: ["\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1F\u0C4D\u0C1F\u0C3F"], answer: "\u0C1F\u0C4D\u0C1F\u0C41" },
+        { prefix: "\u0C15\u0C4B\u0C21\u0C3F\u0C2A\u0C46", options: ["\u0C1F\u0C4D\u0C1F", "\u0C1F\u0C4D\u0C1F\u0C41"], answer: "\u0C1F\u0C4D\u0C1F" },
+        { prefix: "\u0C2A", suffix: "\u0C23\u0C02", options: ["\u0C1F\u0C4D\u0C1F\u0C41", "\u0C1F\u0C4D\u0C1F"], answer: "\u0C1F\u0C4D\u0C1F" } // Suffix logic successfully added to loadStage4 rendering
     ],
 
     // STAGE 5
     stage5Data: [
-        { 
-            // గట్టు మీద చెట్టు ఉంది.
-            correct: "\u0C17\u0C1F\u0C4D\u0C1F\u0C41 \u0C2E\u0C40\u0C26 \u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41 \u0C09\u0C02\u0C26\u0C3F.", 
-            words: ["\u0C2E\u0C40\u0C26", "\u0C17\u0C1F\u0C4D\u0C1F\u0C41", "\u0C09\u0C02\u0C26\u0C3F.", "\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41"] 
-        },
-        { 
-            // పుట్టలో పాము ఉంది.
-            correct: "\u0C2A\u0C41\u0C1F\u0C4D\u0C1F\u0C32\u0C4B \u0C2A\u0C3E\u0C2E\u0C41 \u0C09\u0C02\u0C26\u0C3F.", 
-            words: ["\u0C2A\u0C3E\u0C2E\u0C41", "\u0C09\u0C02\u0C26\u0C3F.", "\u0C2A\u0C41\u0C1F\u0C4D\u0C1F\u0C32\u0C4B"] 
-        }
+        { correct: "\u0C17\u0C1F\u0C4D\u0C1F\u0C41 \u0C2E\u0C40\u0C26 \u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41 \u0C09\u0C02\u0C26\u0C3F.", words: ["\u0C2E\u0C40\u0C26", "\u0C17\u0C1F\u0C4D\u0C1F\u0C41", "\u0C09\u0C02\u0C26\u0C3F.", "\u0C1A\u0C46\u0C1F\u0C4D\u0C1F\u0C41"] },
+        { correct: "\u0C2A\u0C41\u0C1F\u0C4D\u0C1F\u0C32\u0C4B \u0C2A\u0C3E\u0C2E\u0C41 \u0C09\u0C02\u0C26\u0C3F.", words: ["\u0C2A\u0C3E\u0C2E\u0C41", "\u0C09\u0C02\u0C26\u0C3F.", "\u0C2A\u0C41\u0C1F\u0C4D\u0C1F\u0C32\u0C4B"] }
     ]
 };
 
-let synthVoices = [];
-function populateVoices() {
-    try { synthVoices = window.speechSynthesis.getVoices(); } catch(e){}
-}
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoices;
-}
-
-function initializeAppGame() {
-    populateVoices();
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeAppGame);
-} else {
-    initializeAppGame();
-}
-
-// Speak logic adapted for Mobile AppInventor support
-function speak(txt) {
-    try {
-        if (window.AppInventor) {
-            window.AppInventor.setWebViewString(txt);
-        } 
-        else if (window.parent) {
-            window.parent.postMessage({ type: "playAudio", text: txt }, "*");
-        }
-
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            setTimeout(() => {
-                let u = new SpeechSynthesisUtterance(txt);
-                u.lang = 'te-IN';
-                u.rate = 0.75; 
-                window.speechSynthesis.speak(u);
-            }, 100);
-        }
-    } catch (e) {
-        console.log("Audio native routing failed:", e);
-    }
-}
-
 // Stops the video and moves to stage 2
 function startLearning() {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.resume();
-        let silentUtterance = new SpeechSynthesisUtterance("");
-        window.speechSynthesis.speak(silentUtterance);
-    }
-    // Wipe the video container completely to stop playback instantly
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
@@ -325,8 +236,9 @@ function loadStage4() {
         return;
     }
     const q = CONFIG.stage4Data[s4Idx];
+    const suffixText = q.suffix || ""; // Allows standard rendering if no suffix exists in the array object
     
-    qArea.innerHTML = `${s4Idx + 1}. ${q.prefix}<span id="s4-blank" style="border-bottom: 4px dashed #3498db; padding: 0 15px; margin-left: 5px; color: transparent; transition: 0.3s;">_</span>${q.suffix}`;
+    qArea.innerHTML = `${s4Idx + 1}. ${q.prefix}<span id="s4-blank" style="border-bottom: 4px dashed #3498db; padding: 0 15px; margin-left: 5px; color: transparent; transition: 0.3s;">_</span>${suffixText}`;
     
     optArea.innerHTML = '';
     q.options.forEach(opt => {
@@ -412,16 +324,8 @@ function showFinalScore() {
     let rating = (totalAttempts <= 35) ? 5 : (totalAttempts <= 45) ? 4 : (totalAttempts <= 55) ? 3 : (totalAttempts <= 65) ? 2 : 1;
 
      // AUTOMATION: Beams the calculated rating silently to the main blog!
-    try {
-        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
-    } catch(e) {}
+    window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
     
-    try {
-        if (window.AppInventor) {
-            window.AppInventor.setWebViewString("Score:" + rating);
-        }
-    } catch(e) { }
-
     let msgs = [
         "", 
         "\u0C2E\u0C30\u0C3F\u0C02\u0C24 \u0C2A\u0C4D\u0C30\u0C3E\u0C15\u0C4D\u0C1F\u0C40\u0C38\u0C4D \u0C1A\u0C47\u0C2F\u0C3E\u0C32\u0C3F!", // మరింత ప్రాక్టీస్ చేయాలి!
