@@ -44,7 +44,9 @@
     
     <div class="stage active" id="stage1">
         <h3>Step 1: Watch the Video</h3>
-        <div id="video-container"></div>
+        <div id="video-container">
+            <iframe width="100%" height="315" src="https://www.youtube.com/embed/6xgkzulOsxg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="margin-bottom:15px; border-radius: 10px; border: 1px solid #ccc;"></iframe>
+        </div>
         <button class="btn-main" onclick="startLearning()">Start Exercise</button>
     </div>
 
@@ -95,7 +97,6 @@
 
 <script>
 const CONFIG = {
-    videoID: ["6xgkzulOsxg"],
     stage2Letters: ['\u0C26', '\u0C24', '\u0C17', '\u0C38', '\u0C28', '\u0C08'], 
     stage4Letters: ['\u0C26\u0C02', '\u0C24', '\u0C08', '\u0C35\u0C02', '\u0C24\u0C02', '\u0C21'], 
     stage4Answers: { b1: '\u0C21', b2: '\u0C26\u0C02', b3: '\u0C35\u0C02', b4: '\u0C24\u0C02', b5: '\u0C08', b6: '\u0C24' }
@@ -125,25 +126,15 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-// INITIALIZATION ROUTINE - Stripped down to just loading the video
+// Minimal Initialization
 function initializeAppGame() {
     populateVoices();
-    const vidContainer = document.getElementById('video-container');
-    if(vidContainer) {
-        vidContainer.innerHTML = '';
-        for(let i=0; i<CONFIG.videoIDs.length; i++) {
-            let id = CONFIG.videoIDs[i];
-            vidContainer.innerHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen style="margin-bottom:15px;"></iframe>`;
-        }
-    }
 }
 
-// BULLETPROOF EVENT LISTENER
-// Checks if the page is already loaded. If it is, run immediately. If not, wait for it.
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initializeAppGame, 400));
+    document.addEventListener('DOMContentLoaded', initializeAppGame);
 } else {
-    setTimeout(initializeAppGame, 400);
+    initializeAppGame();
 }
 
 function speak(txt) {
@@ -181,6 +172,8 @@ function startLearning() {
         let silentUtterance = new SpeechSynthesisUtterance("");
         window.speechSynthesis.speak(silentUtterance);
     }
+    
+    // Stop the video playing in the background by wiping the iframe container
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
@@ -189,7 +182,6 @@ function goToStage(n) {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('stage' + n).classList.add('active');
     
-    // Now ALL stages load their dynamic content exactly when the stage is opened
     if(n === 2) loadId();
     if(n === 3) loadScramble();
     if(n === 4) loadStage4(); 
@@ -268,7 +260,6 @@ function loadScramble() {
     });
 }
 
-// NEW FUNCTION: Builds Stage 4 tiles dynamically when Stage 4 is reached
 function loadStage4() {
     const s4grid = document.getElementById('stage4-tiles');
     if(s4grid && s4grid.innerHTML === '') {
