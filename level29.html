@@ -1,9 +1,9 @@
 <html lang="te">
 <head>
-    <meta charset="UTF-8"></meta>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Learn Telugu Online: "న్న" ఒత్తు పదాలు - Interactive Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&amp;display=swap" rel="stylesheet"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Ramabhadra', 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 10px; }
         #lms-container { max-width: 700px; margin: 20px auto; border: 3px solid #2980b9; padding: 25px; border-radius: 20px; background: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -173,56 +173,8 @@ const CONFIG = {
     ]
 };
 
-let synthVoices = [];
-function populateVoices() {
-    try { synthVoices = window.speechSynthesis.getVoices(); } catch(e){}
-}
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoices;
-}
-
-function initializeAppGame() {
-    populateVoices();
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeAppGame);
-} else {
-    initializeAppGame();
-}
-
-// Speak logic adapted for Mobile AppInventor support
-function speak(txt) {
-    try {
-        if (window.AppInventor) {
-            window.AppInventor.setWebViewString(txt);
-        } 
-        else if (window.parent) {
-            window.parent.postMessage({ type: "playAudio", text: txt }, "*");
-        }
-
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            setTimeout(() => {
-                let u = new SpeechSynthesisUtterance(txt);
-                u.lang = 'te-IN';
-                u.rate = 0.75; 
-                window.speechSynthesis.speak(u);
-            }, 100);
-        }
-    } catch (e) {
-        console.log("Audio native routing failed:", e);
-    }
-}
-
 // Stops the video and moves to stage 2
 function startLearning() {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.resume();
-        let silentUtterance = new SpeechSynthesisUtterance("");
-        window.speechSynthesis.speak(silentUtterance);
-    }
-    // Wipe the video container completely to stop playback instantly
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
@@ -325,8 +277,9 @@ function loadStage4() {
         return;
     }
     const q = CONFIG.stage4Data[s4Idx];
+    const suffixText = q.suffix || ""; // Allows standard rendering if no suffix exists in the array object
     
-    qArea.innerHTML = `${s4Idx + 1}. ${q.prefix}<span id="s4-blank" style="border-bottom: 4px dashed #3498db; padding: 0 15px; margin-left: 5px; color: transparent; transition: 0.3s;">_</span>${q.suffix}`;
+    qArea.innerHTML = `${s4Idx + 1}. ${q.prefix}<span id="s4-blank" style="border-bottom: 4px dashed #3498db; padding: 0 15px; margin-left: 5px; color: transparent; transition: 0.3s;">_</span>${suffixText}`;
     
     optArea.innerHTML = '';
     q.options.forEach(opt => {
@@ -412,16 +365,8 @@ function showFinalScore() {
     let rating = (totalAttempts <= 35) ? 5 : (totalAttempts <= 45) ? 4 : (totalAttempts <= 55) ? 3 : (totalAttempts <= 65) ? 2 : 1;
 
      // AUTOMATION: Beams the calculated rating silently to the main blog!
-    try {
-        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
-    } catch(e) {}
+    window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
     
-    try {
-        if (window.AppInventor) {
-            window.AppInventor.setWebViewString("Score:" + rating);
-        }
-    } catch(e) { }
-
     let msgs = [
         "", 
         "\u0C2E\u0C30\u0C3F\u0C02\u0C24 \u0C2A\u0C4D\u0C30\u0C3E\u0C15\u0C4D\u0C1F\u0C40\u0C38\u0C4D \u0C1A\u0C47\u0C2F\u0C3E\u0C32\u0C3F!", // మరింత ప్రాక్టీస్ చేయాలి!
