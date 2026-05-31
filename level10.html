@@ -26,7 +26,7 @@
 </script>
     <meta charset="UTF-8"></meta>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
-    <title>పాఠం -10 అభ్యాసన దీపిక</title>
+    <title>పాఠం -10  అభ్యాసన దీపిక</title>
     <link href="https://fonts.googleapis.com/css2?family=Ramabhadra&amp;display=swap" rel="stylesheet"></link>
     <style>
         body { font-family: 'Ramabhadra', 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 10px; }
@@ -48,8 +48,7 @@
         .tile { border: 3px solid #ddd; background: #fff; cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
         .tile:active { transform: translateY(4px); box-shadow: none; }
         
-        /* Enforced high contrast configuration rules for mobile WebView font clarity */
-        .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #2c3e50 !important; font-weight: bold; }
+        .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; }
         
         .selected-blank { border: 3px solid #e67e22 !important; background: #fff3e0 !important; }
         .wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
@@ -65,7 +64,7 @@
 <body>
 
 <div id="lms-container">
-    <h2 style="color: #2c3e50; text-align: center;">పాఠం -10,- "ద, డ, అక్షరాలు" - అభ్యాసన దీపిక</h2>
+    <h2 style="color: #2c3e50; text-align: center;">పాఠం -10,- ద, డ, అక్షరాలు" - అభ్యాసన దీపిక</h2>
     
     <div class="stage active" id="stage1">
         <h3>Step 1: Watch the Video</h3>
@@ -75,7 +74,7 @@
 
     <div class="stage" id="stage2">
         <h3>Step 2: Identify the Letter</h3>
-        <p>Listen carefully and click the letter <button onclick="replayAudio()" style="background:none; border:none; font-size:24px; cursor:pointer; outline:none;" title="Play Sound">🔊</button></p>
+        <p>Listen carefully and click the letter</p>
         <div class="tile-grid" id="id-grid"></div>
         <div class="feedback-box" id="stage2-feedback">
             <h3 style="color: #27ae60;">Well Done!</h3>
@@ -120,9 +119,9 @@
 
 <script>
 const CONFIG = {
-    // FIXED: Formatted video properties into a clean array parameter to stop rendering blocks
-    videoIDs: ["6xgkzulOsxg"],
+    videoID: "6xgkzulOsxg",
     
+    // Stage 2 letters: ద, త, గ, స, న, ఈ
     stage2Letters: [
         '\u0C26', // ద
         '\u0C24', // త
@@ -132,6 +131,7 @@ const CONFIG = {
         '\u0C08'  // ఈ
     ], 
 
+    // Stage 4 letters: దం, త, ఈ, వం, తం, డ
     stage4Letters: [
         '\u0C26\u0C02', // దం
         '\u0C24',       // త
@@ -141,6 +141,7 @@ const CONFIG = {
         '\u0C21'        // డ
     ], 
 
+    // Stage 4 answers: డ, దం, వం, తం, ఈ, త
     stage4Answers: { 
         b1: '\u0C21',       // డ
         b2: '\u0C26\u0C02', // దం
@@ -152,42 +153,49 @@ const CONFIG = {
 };
 const wordData = [
     {
+        // దడ (Da-da)
         w: '\u0C26\u0C21', 
         l: ['\u0C26', '\u0C21'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEjHVFvxPTa3Ax2eroZOXz-PsbCS1l6lJbjC2K1QvpXw2ylj_2Kg-PFyv9Er65UKV0GtmoqIqxeR3t64NUapyxNKs5JX0SnkK4Zlr9V0Agg_pLU8d8F-NzK8-kGBtuZqD5vSqoM6gAcouH8B9U9V7VeA5jB8y0pP8SNRxz1Rl-MtklqmilA-qyVqf3PRmcwn'
     },
     {
+        // దండ (Dan-da)
         w: '\u0C26\u0C02\u0C21', 
         l: ['\u0C26\u0C02', '\u0C21'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgN66hOTQHfAj56g3PYNFf_2cNdz8lPHpuczff9ZmpM7jwWmgMX_cvS71QM8PVcN0m5IBLmMa2GUrQvfDl3lnlPyxtdWroFgBk05IMY72Vum-CSg2e9N2X77rpwiNXCfde5obYVkrTa9_jvpcMSHV4nTRr1t2KLm4CXRop_H0c01HjiqZvN7AEk23UIkdJA'
     },
     {
+        // వంద (Van-da)
         w: '\u0C35\u0C02\u0C26', 
         l: ['\u0C35\u0C02', '\u0C26'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgOGxspT382Vz91LdbqPmkHqsSt4U1qB6QY11UIzkVjyTyfbMjaRBrGY6fNdm9dtmROWZaUawVt38a1aHBq1vWVQ4bXq4DcNj7xdH8pLOFJvqhxUtBlJFDKzVicYTNb3q1VCzjbcGE_OQb42MtMRi7lGC59sfxv5lcTvDvZZ5LF2aosrXk2MGD5kkIeEBRz'
     },
     {
+        // దంతం (Dan-tham)
         w: '\u0C26\u0C02\u0C24\u0C02', 
         l: ['\u0C26\u0C02', '\u0C24\u0C02'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEhpsTx0LrOzv-toFkzOwicoMxcuBAdrkCiVyWfqOwc4gG8GHOAJQQ1qvZNAia7J7PwyHvFNy2vzL6slkxuHP2wZmA0XBRpvQrlyvH8lYa_9zkF-U93aSaIMLEx1UhPL_n5ZJTbx7ixmQBBQZuQux_IqJrepdm9xZogRqCf-zkFbVxYqQCW5c3nArUisqrGo'
     },
     {
+        // ఈత (Ee-tha)
         w: '\u0C08\u0C24', 
         l: ['\u0C08', '\u0C24'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgDQHrVWPEAJitjmlEhc8Q68aOaOMmZUPHJZkRiRxZ5xZtrEotB_hh-vtP44ONI2IKZtYp89hTWz3oWu2ySLwQT0p4c8zm7iE-TCr4wCqzkQSJKLxZoe19MK5vw2KGQO54uy5dlbiwJmGha8Btocz49C1UqUOpjjN9e4dCnxU7wmADFejrfFXfTYH1ldmk9'
     },
     {
+        // ఈక (Ee-ka)
         w: '\u0C08\u0C15', 
         l: ['\u0C08', '\u0C15'], 
         img: 'https://blogger.googleusercontent.com/img/a/AVvXsEgWPEo2XbC1T-eGRB5oD3tqdb0NSVRJi5vKSsMBGtf0mgl1ybWqrdFm4vHhj0_f7y_co3zu0cZbo-bkbKu7McdkT3KOizE5kc_gqUZRbbuNtAo9Dud_5PkkM4ZJY9A1-RuuCFGX-Egbt9MTdPKD8HLIo6RgWlJxA51eDLrd9N8ZeXOtpBOC4JWllk3o2v73'
     }
 ];
-
 let totalAttempts = 0;
 let activeBlank = null;
 let qIdx = 0;
 let wordIdx = 0;
 
+// Update: Create a shuffled list of all 6 unique letters
+// This ensures every letter is asked exactly once.
 const targetSet = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
 let synthVoices = [];
@@ -198,71 +206,25 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-// FIXED CORE INITIALIZATION LOOP HANDLER
-window.onload = () => {
-    populateVoices();
-    
-    const vidContainer = document.getElementById('video-container');
-    if(vidContainer) {
-        vidContainer.innerHTML = '';
-        CONFIG.videoIDs.forEach(id => {
-            vidContainer.innerHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen style="margin-bottom:15px;"></iframe>`;
-        });
-    }
-    
-    const s4grid = document.getElementById('stage4-tiles');
-    if(s4grid) {
-        s4grid.innerHTML = ''; 
-        CONFIG.stage4Letters.forEach(l => {
-            const t = document.createElement('div');
-            t.className = 'tile'; 
-            t.innerText = l;
-            t.onclick = () => fillSelected(l);
-            s4grid.appendChild(t);
-        });
-    }
-};
-
 function speak(txt) {
-    try {
-        if (window.AppInventor) {
-            window.AppInventor.setWebViewString(txt);
-        } 
-        else if (window.parent) {
-            window.parent.postMessage({ type: "playAudio", text: txt }, "*");
-        }
-
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            setTimeout(() => {
-                let u = new SpeechSynthesisUtterance(txt);
-                u.lang = 'te-IN';
-                u.rate = 0.75; 
-                window.speechSynthesis.speak(u);
-            }, 100);
-        }
-    } catch (e) {
-        console.log("Audio native routing failed:", e);
-    }
-}
-
-function replayAudio() {
-    if (qIdx < targetSet.length) {
-        speak(targetSet[qIdx]);
-    }
+    if (!txt) return; 
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'te-IN';
+    u.rate = 0.8; 
+    const teluguVoice = synthVoices.find(v => v.lang.includes('te'));
+    if (teluguVoice) u.voice = teluguVoice;
+    window.speechSynthesis.speak(u);
 }
 
 function startLearning() {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.resume();
-        let silentUtterance = new SpeechSynthesisUtterance("");
-        window.speechSynthesis.speak(silentUtterance);
-    }
+    window.speechSynthesis.resume();
+    let silentUtterance = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(silentUtterance);
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
 
-// RESTORED STAGE LAYER CONTROLS
 function goToStage(n) {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('stage' + n).classList.add('active');
@@ -270,20 +232,28 @@ function goToStage(n) {
     if(n === 3) loadScramble();
 }
 
+// Logic updated to cycle through all 6 letters without repeating or leaving any out
 function loadId() {
     const grid = document.getElementById('id-grid');
     const feedbackBox = document.getElementById('stage2-feedback');
     
+    // Check if we have completed all 6 letters
     if(qIdx >= targetSet.length) {
         grid.innerHTML = '';
         feedbackBox.style.display = 'block';
         return;
     }
 
+    // Get the current target letter from the shuffled 6-letter set
     const target = targetSet[qIdx];
+    
+    // Slight delay to allow the UI to refresh before speaking
     setTimeout(() => speak(target), 500);
 
+    // Clear and Redraw the grid with a NEW random order
     grid.innerHTML = '';
+    
+    // Create a fresh shuffled array of the 6 letters for the UI tiles
     const displayTiles = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
     displayTiles.forEach(letter => {
@@ -294,20 +264,25 @@ function loadId() {
         t.onclick = () => {
             totalAttempts++;
             if(letter === target) { 
+                // Visual feedback for correct answer
                 t.style.background = "#d4edda";
                 t.style.borderColor = "#28a745";
+                
+                // Move to the next index in the 6-letter sequence
                 qIdx++; 
+                
+                // Refresh the whole grid (Randomize positions for the next turn)
                 setTimeout(loadId, 800); 
             } else { 
+                // Visual feedback for wrong answer
                 t.classList.add('wrong');
-                speak(target); 
+                speak(target); // Repeat the target letter if they miss
                 setTimeout(() => t.classList.remove('wrong'), 500);
             }
         };
         grid.appendChild(t);
     });
 }
-
 function loadScramble() {
     if(wordIdx >= wordData.length) {
         document.getElementById('image-container').innerHTML = "";
@@ -349,36 +324,11 @@ function selectBlank(n) {
     document.getElementById('b'+n).classList.add('selected-blank');
 }
 
-// FIXED: Implemented auto fallback matching index selectors to prevent block drop hanging
 function fillSelected(l) {
-    if (!activeBlank) {
-        for (let i = 1; i <= 6; i++) {
-            if (!document.getElementById('b' + i).innerText) {
-                activeBlank = i;
-                break;
-            }
-        }
-    }
-
-    if (activeBlank) {
+    if(activeBlank) {
         totalAttempts++;
-        document.getElementById('b' + activeBlank).innerText = l;
-        document.getElementById('b' + activeBlank).classList.remove('wrong');
-        
-        let nextEmpty = null;
-        for (let i = 1; i <= 6; i++) {
-            if (!document.getElementById('b' + i).innerText) {
-                nextEmpty = i;
-                break;
-            }
-        }
-        
-        if (nextEmpty) {
-            selectBlank(nextEmpty);
-        } else {
-            activeBlank = null;
-            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('selected-blank'));
-        }
+        document.getElementById('b'+activeBlank).innerText = l;
+        document.getElementById('b'+activeBlank).classList.remove('wrong');
     }
 }
 
@@ -386,12 +336,8 @@ function checkStage4() {
     let allCorrect = true;
     for(let k in CONFIG.stage4Answers) {
         const el = document.getElementById(k);
-        if(el.innerText.trim() === CONFIG.stage4Answers[k].trim()) {
-            el.className = 'drop-zone correct';
-        } else { 
-            el.className = 'drop-zone wrong'; 
-            allCorrect = false; 
-        }
+        if(el.innerText === CONFIG.stage4Answers[k]) el.className = 'drop-zone correct';
+        else { el.className = 'drop-zone wrong'; allCorrect = false; }
     }
     if(allCorrect) {
         document.getElementById('check-btn').style.display = 'none';
@@ -402,27 +348,28 @@ function checkStage4() {
 function showFinalScore() {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('finish').classList.add('active');
-    
     let rating = (totalAttempts <= 27) ? 5 : (totalAttempts <= 32) ? 4 : (totalAttempts <= 38) ? 3 : (totalAttempts <= 45) ? 2 : 1;
     let msgs = ["", "Try Again!", "Keep Practicing!", "Good Effort!", "Great Job!", "Perfect Mastery!"];
     let stars = "";
     for (let i = 1; i <= 5; i++) stars += (i <= rating) ? '<span class="star-filled">\u2605</span>' : '<span class="star-empty">\u2606</span>';
-    
     document.getElementById('star-display').innerHTML = stars;
     document.getElementById('final-eval-text').innerText = msgs[rating];
 
-    try {
-        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
-    } catch(e) {
-        console.log("hub.html communication failed:", e);
-    }
-
-    try {
-        if (window.AppInventor) {
-            window.AppInventor.setWebViewString("Score:" + rating);
-        }
-    } catch(e) { }
+  // AUTOMATION: Beams the calculated rating silently to the main blog!
+    window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
 }
+
+window.onload = () => {
+    const vidContainer = document.getElementById('video-container');
+    if(vidContainer) vidContainer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
+    const s4grid = document.getElementById('stage4-tiles');
+    CONFIG.stage4Letters.forEach(l => {
+        const t = document.createElement('div');
+        t.className = 'tile'; t.innerText = l;
+        t.onclick = () => fillSelected(l);
+        s4grid.appendChild(t);
+    });
+};
 </script>
 </body>
 </html>
