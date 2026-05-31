@@ -1,29 +1,5 @@
 <html lang="te">
 <head>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": ["SoftwareApplication", "LearningResource"],
-  "name": "Telugu Alphabet Practice Game: గంట",
-  "operatingSystem": "Any",
-  "applicationCategory": "EducationalGame",
-  "url": "https://www.rajclassroom.com/learn-telugu-alphabet-interactive-game-gan-ta",
-  "image": "https://www.rajclassroom.com/path-to-your-game-thumbnail.jpg",
-  "description": "An interactive Telugu alphabet game for NRI kids to learn letters 'గ', 'ద ', and 'ట' through fun puzzles and tracing.",
-  "educationalLevel": "Primary School",
-  "inLanguage": "te",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "24"
-  }
-}
-</script>
     <meta charset="UTF-8"></meta>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
     <title>పాఠం -11 అభ్యాసన దీపిక</title>
@@ -48,7 +24,6 @@
         .tile { border: 3px solid #ddd; background: #fff; cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
         .tile:active { transform: translateY(4px); box-shadow: none; }
         
-        /* FIXED: Force clear text visibility color context inside mobile container engines */
         .drop-zone { border: 2px dashed #3498db; margin: 5px; background: #f0f7ff; cursor: pointer; vertical-align: middle; display: inline-flex; color: #2c3e50 !important; font-weight: bold; }
         
         .selected-blank { border: 3px solid #e67e22 !important; background: #fff3e0 !important; }
@@ -69,7 +44,11 @@
     
     <div class="stage active" id="stage1">
         <h3>Step 1: Watch the Video</h3>
-        <div id="video-container"></div>
+        <div id="video-container">
+            <!-- Hardcoded iframes for both videos to ensure bulletproof loading -->
+            <iframe width="100%" height="315" src="https://www.youtube.com/embed/g6htygGkEiw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="margin-bottom:15px; border-radius: 10px; border: 1px solid #ccc;"></iframe>
+            <iframe width="100%" height="315" src="https://www.youtube.com/embed/10byNELcndQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="margin-bottom:15px; border-radius: 10px; border: 1px solid #ccc;"></iframe>
+        </div>
         <button class="btn-main" onclick="startLearning()">Start Exercise</button>
     </div>
 
@@ -122,9 +101,6 @@
 
 <script>
 const CONFIG = {
-    videoIDs: ["g6htygGkEiw", "10byNELcndQ"],
-    
-    // Stage 2 letters: ద, గ, ట, జ, వ, ర
     stage2Letters: [
         '\u0C26', // ద
         '\u0C17', // గ
@@ -134,7 +110,6 @@ const CONFIG = {
         '\u0C30'  // ర
     ], 
 
-    // Stage 4 letters: దం, డ, తం, గ, ర, ట, ప, జం
     stage4Letters: [
         '\u0C26\u0C02', // దం
         '\u0C21',       // డ
@@ -146,7 +121,6 @@ const CONFIG = {
         '\u0C1C\u0C02'  // జం
     ], 
 
-    // Stage 4 answers: గ, ర, ప, డ, దం, తం, ట, జం
     stage4Answers: { 
         b1: '\u0C17',       // గ
         b2: '\u0C30',       // ర
@@ -158,6 +132,7 @@ const CONFIG = {
         b8: '\u0C1C\u0C02'  // జం
     }
 };
+
 const wordData = [
     {
         w: '\u0C17\u0C26', 
@@ -210,35 +185,22 @@ const targetSet = [...CONFIG.stage2Letters].sort(() => Math.random() - 0.5);
 
 let synthVoices = [];
 function populateVoices() {
-    synthVoices = window.speechSynthesis.getVoices();
+    try { synthVoices = window.speechSynthesis.getVoices(); } catch(e){}
 }
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = populateVoices;
 }
 
-window.onload = () => {
+// Minimal Initialization
+function initializeAppGame() {
     populateVoices();
-    
-    const vidContainer = document.getElementById('video-container');
-    if(vidContainer) {
-        vidContainer.innerHTML = '';
-        CONFIG.videoIDs.forEach(id => {
-            vidContainer.innerHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen style="margin-bottom: 15px;"></iframe>`;
-        });
-    }
-    
-    const s4grid = document.getElementById('stage4-tiles');
-    if(s4grid) {
-        s4grid.innerHTML = ''; 
-        CONFIG.stage4Letters.forEach(l => {
-            const t = document.createElement('div');
-            t.className = 'tile'; 
-            t.innerText = l;
-            t.onclick = () => fillSelected(l);
-            s4grid.appendChild(t);
-        });
-    }
-};
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAppGame);
+} else {
+    initializeAppGame();
+}
 
 function speak(txt) {
     try {
@@ -275,6 +237,8 @@ function startLearning() {
         let silentUtterance = new SpeechSynthesisUtterance("");
         window.speechSynthesis.speak(silentUtterance);
     }
+    
+    // Stop the video playing in the background by wiping the iframe container
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
@@ -282,8 +246,10 @@ function startLearning() {
 function goToStage(n) {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('stage' + n).classList.add('active');
+    
     if(n === 2) loadId();
     if(n === 3) loadScramble();
+    if(n === 4) loadStage4(); 
 }
 
 function loadId() {
@@ -359,6 +325,20 @@ function loadScramble() {
     });
 }
 
+function loadStage4() {
+    const s4grid = document.getElementById('stage4-tiles');
+    if(s4grid && s4grid.innerHTML === '') {
+        for(let j=0; j<CONFIG.stage4Letters.length; j++) {
+            let letterValue = CONFIG.stage4Letters[j];
+            const t = document.createElement('div');
+            t.className = 'tile'; 
+            t.innerText = letterValue;
+            t.onclick = function() { fillSelected(letterValue); };
+            s4grid.appendChild(t);
+        }
+    }
+}
+
 function selectBlank(n) {
     activeBlank = n;
     document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('selected-blank'));
@@ -367,6 +347,7 @@ function selectBlank(n) {
 
 function fillSelected(l) {
     if (!activeBlank) {
+        // Updated to 8 blanks for Level 11
         for (let i = 1; i <= 8; i++) {
             if (!document.getElementById('b' + i).innerText) {
                 activeBlank = i;
@@ -381,6 +362,7 @@ function fillSelected(l) {
         document.getElementById('b' + activeBlank).classList.remove('wrong');
         
         let nextEmpty = null;
+        // Updated to 8 blanks for Level 11
         for (let i = 1; i <= 8; i++) {
             if (!document.getElementById('b' + i).innerText) {
                 nextEmpty = i;
