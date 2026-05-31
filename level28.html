@@ -191,9 +191,38 @@ if (document.readyState === 'loading') {
     initializeAppGame();
 }
 
+// Speak logic adapted for Mobile AppInventor support
+function speak(txt) {
+    try {
+        if (window.AppInventor) {
+            window.AppInventor.setWebViewString(txt);
+        } 
+        else if (window.parent) {
+            window.parent.postMessage({ type: "playAudio", text: txt }, "*");
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setTimeout(() => {
+                let u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'te-IN';
+                u.rate = 0.75; 
+                window.speechSynthesis.speak(u);
+            }, 100);
+        }
+    } catch (e) {
+        console.log("Audio native routing failed:", e);
+    }
+}
+
 // Stops the video and moves to stage 2
 function startLearning() {
-    // Stop the video playing in the background by wiping the container
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.resume();
+        let silentUtterance = new SpeechSynthesisUtterance("");
+        window.speechSynthesis.speak(silentUtterance);
+    }
+    // Wipe the video container completely to stop playback instantly
     document.getElementById('video-container').innerHTML = ""; 
     goToStage(2);
 }
@@ -383,15 +412,24 @@ function showFinalScore() {
     let rating = (totalAttempts <= 35) ? 5 : (totalAttempts <= 45) ? 4 : (totalAttempts <= 55) ? 3 : (totalAttempts <= 65) ? 2 : 1;
 
      // AUTOMATION: Beams the calculated rating silently to the main blog!
-    window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+    try {
+        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+    } catch(e) {}
+    
+    try {
+        if (window.AppInventor) {
+            window.AppInventor.setWebViewString("Score:" + rating);
+        }
+    } catch(e) { }
+
     let msgs = [
-    "", 
-    "\u0C2E\u0C30\u0C3F\u0C02\u0C24 \u0C2A\u0C4D\u0C30\u0C3E\u0C15\u0C4D\u0C1F\u0C40\u0C38\u0C4D \u0C1A\u0C47\u0C2F\u0C3E\u0C32\u0C3F!", // మరింత ప్రాక్టీస్ చేయాలి!
-    "\u0C2A\u0C30\u0C4D\u0C35\u0C3E\u0C32\u0C47\u0C26\u0C41, \u0C07\u0C02\u0C15\u0C3E \u0C2A\u0C4D\u0C30\u0C2F\u0C24\u0C4D\u0C28\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F!", // పర్వాలేదు, ఇంకా ప్రయత్నించండి!
-    "\u0C2C\u0C3E\u0C17\u0C3E \u0C1A\u0C47\u0C36\u0C3E\u0C30\u0C41!", // బాగా చేశారు!
-    "\u0C1A\u0C3E\u0C32\u0C3E \u0C2C\u0C3E\u0C17\u0C41\u0C02\u0C26\u0C3F!", // చాలా బాగుంది!
-    "\u0C05\u0C26\u0C4D\u0C2D\u0C41\u0C24\u0C02! (Perfect Score)" // అద్భుతం! (Perfect Score)
-];
+        "", 
+        "\u0C2E\u0C30\u0C3F\u0C02\u0C24 \u0C2A\u0C4D\u0C30\u0C3E\u0C15\u0C4D\u0C1F\u0C40\u0C38\u0C4D \u0C1A\u0C47\u0C2F\u0C3E\u0C32\u0C3F!", // మరింత ప్రాక్టీస్ చేయాలి!
+        "\u0C2A\u0C30\u0C4D\u0C35\u0C3E\u0C32\u0C47\u0C26\u0C41, \u0C07\u0C02\u0C15\u0C3E \u0C2A\u0C4D\u0C30\u0C2F\u0C24\u0C4D\u0C28\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F!", // పర్వాలేదు, ఇంకా ప్రయత్నించండి!
+        "\u0C2C\u0C3E\u0C17\u0C3E \u0C1A\u0C47\u0C36\u0C3E\u0C30\u0C41!", // బాగా చేశారు!
+        "\u0C1A\u0C3E\u0C32\u0C3E \u0C2C\u0C3E\u0C17\u0C41\u0C02\u0C26\u0C3F!", // చాలా బాగుంది!
+        "\u0C05\u0C26\u0C4D\u0C2D\u0C41\u0C24\u0C02! (Perfect Score)" // అద్భుతం! (Perfect Score)
+    ];
     
     let stars = "";
     for (let i = 1; i <= 5; i++) {
