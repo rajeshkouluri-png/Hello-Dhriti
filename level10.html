@@ -207,15 +207,30 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 }
 
 function speak(txt) {
-    if (!txt) return; 
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt);
-    u.lang = 'te-IN';
-    u.rate = 0.8; 
-    const teluguVoice = synthVoices.find(v => v.lang.includes('te'));
-    if (teluguVoice) u.voice = teluguVoice;
-    window.speechSynthesis.speak(u);
-}
+        try {
+            // 1. Kodular Preferred Method: Send text to WebViewString
+            if (window.AppInventor) {
+                window.AppInventor.setWebViewString(txt);
+            } 
+            // 2. Parent iframe postMessage Backup
+            else if (window.parent) {
+                window.parent.postMessage({ type: "playAudio", text: txt }, "*");
+            }
+
+            // 3. Browser Fallback (For your Blogger site)
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                setTimeout(() => {
+                    let u = new SpeechSynthesisUtterance(txt);
+                    u.lang = 'te-IN';
+                    u.rate = 0.75; 
+                    window.speechSynthesis.speak(u);
+                }, 100);
+            }
+        } catch (e) {
+            console.log("Audio native routing failed:", e);
+        }
+    }
 
 function startLearning() {
     window.speechSynthesis.resume();
@@ -348,28 +363,31 @@ function checkStage4() {
 function showFinalScore() {
     document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
     document.getElementById('finish').classList.add('active');
-    let rating = (totalAttempts <= 27) ? 5 : (totalAttempts <= 32) ? 4 : (totalAttempts <= 38) ? 3 : (totalAttempts <= 45) ? 2 : 1;
+    
+    let rating = (totalAttempts <= 30) ? 5 : (totalAttempts <= 35) ? 4 : (totalAttempts <= 40) ? 3 : (totalAttempts <= 45) ? 2 : 1;
     let msgs = ["", "Try Again!", "Keep Practicing!", "Good Effort!", "Great Job!", "Perfect Mastery!"];
     let stars = "";
     for (let i = 1; i <= 5; i++) stars += (i <= rating) ? '<span class="star-filled">\u2605</span>' : '<span class="star-empty">\u2606</span>';
+    
     document.getElementById('star-display').innerHTML = stars;
     document.getElementById('final-eval-text').innerText = msgs[rating];
 
-  // AUTOMATION: Beams the calculated rating silently to the main blog!
-    window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
-}
+    // --- FIXED COMBINED HANDSHAKE ---
+    
+    // 1. ALWAYS fire the postMessage so your hub.html catches it, saves to Firebase, and blinks the return tab!
+    try {
+        window.top.postMessage({ type: "autoSaveScore", stars: rating }, "*");
+    } catch(e) {
+        console.log("hub.html communication failed:", e);
+    }
 
-window.onload = () => {
-    const vidContainer = document.getElementById('video-container');
-    if(vidContainer) vidContainer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${CONFIG.videoID}" frameborder="0" allowfullscreen></iframe>`;
-    const s4grid = document.getElementById('stage4-tiles');
-    CONFIG.stage4Letters.forEach(l => {
-        const t = document.createElement('div');
-        t.className = 'tile'; t.innerText = l;
-        t.onclick = () => fillSelected(l);
-        s4grid.appendChild(t);
-    });
-};
+    // 2. ALSO notify Kodular just in case you ever want to track scores inside app blocks
+    try {
+        if (window.AppInventor) {
+            window.AppInventor.setWebViewString("Score:" + rating);
+        }
+    } catch(e) { }
+}
 </script>
 </body>
 </html>
